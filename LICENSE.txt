@@ -1,0 +1,8 @@
+Copyright (c) 2026 Brevisluna
+
+Permission is granted to use, modify and redistribute this software
+for personal, educational, artistic and research purposes.
+
+Commercial use, resale, sublicensing, hosting as a paid service,
+or inclusion in a commercial product is prohibited without prior
+written permission from the author.
