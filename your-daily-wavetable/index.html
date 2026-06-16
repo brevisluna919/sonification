@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your Daily Wavetable</title>
+
+<!-- ────────────────────────────────────────────────────────────────────────
+     YOUR DAILY WAVETABLE
+     Share or type a location. The day's sea near you (wave height, period,
+     swell, surface temperature, sea level and current, hour by hour) is read
+     from the Open-Meteo Marine API and rendered into a 256-frame wavetable.
+     The morph axis is the 24 hours of the day: frame 0 is 00:00, the last
+     frame is midnight again. Audition it, distort it, and export a WAV ready
+     for Serum, Vital, or any wavetable synth.
+
+     Single self-contained file · native Web Audio for preview · no API key.
+     When a location has no marine coverage (or the network is unavailable) a
+     deterministic estimated sea state is used instead, and labelled as such.
+──────────────────────────────────────────────────────────────────────────── -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    --paper:#f3f1ea; --paper-2:#ece9e0; --paper-3:#e6e3d9;
+    --ink:#1b1b18; --ink-soft:#4d4d46; --ink-faint:#8d8d83;
+    --rule:#cfccbf; --rule-soft:#ddd9cd; --ink-well:#f7f5ef;
+    --f-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; }
+  body{ background:var(--paper); color:var(--ink); font-family:var(--f-mono); font-size:13px; line-height:1.45; -webkit-font-smoothing:antialiased; }
+  ::selection{ background:var(--ink); color:var(--paper); }
+  button,select,input{ font-family:var(--f-mono); }
+
+  .tbtn{ background:var(--ink-well); color:var(--ink); border:1px solid var(--rule); border-radius:0; font-size:10px; letter-spacing:0.08em; text-transform:uppercase; padding:7px 12px; cursor:pointer; white-space:nowrap; transition:background .12s,color .12s,border-color .12s; }
+  .tbtn:hover:not(:disabled){ border-color:var(--ink); }
+  .tbtn:active:not(:disabled){ background:var(--ink); color:var(--paper); }
+  .tbtn.solid{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .tbtn.solid:hover:not(:disabled){ background:var(--ink-soft); }
+  .tbtn.full{ width:100%; padding:9px; }
+  .tbtn:disabled{ color:var(--ink-faint); cursor:not-allowed; }
+  .tbtn.on{ background:var(--ink); color:var(--paper); }
+
+  input[type=text]{ width:100%; background:var(--ink-well); color:var(--ink); border:1px solid var(--rule); border-radius:0; font-size:13px; padding:9px 10px; }
+  input[type=text]:focus{ outline:none; border-color:var(--ink); }
+  select{ width:100%; appearance:none; -webkit-appearance:none; background:var(--ink-well); color:var(--ink); border:1px solid var(--rule); border-radius:0; font-size:12px; padding:6px 22px 6px 8px; cursor:pointer;
+    background-image:linear-gradient(45deg,transparent 50%,var(--ink-soft) 50%),linear-gradient(135deg,var(--ink-soft) 50%,transparent 50%);
+    background-position:calc(100% - 13px) 12px,calc(100% - 8px) 12px; background-size:5px 5px,5px 5px; background-repeat:no-repeat; }
+  select:hover{ border-color:var(--ink); }
+  select:focus-visible,button:focus-visible,input:focus-visible{ outline:2px solid var(--ink); outline-offset:1px; }
+  option{ background:var(--paper); color:var(--ink); }
+  input[type=range]{ -webkit-appearance:none; appearance:none; width:100%; height:2px; background:var(--rule); cursor:pointer; }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:10px; height:16px; background:var(--ink); border:none; cursor:pointer; }
+  input[type=range]::-moz-range-thumb{ width:10px; height:16px; background:var(--ink); border:none; border-radius:0; }
+  input[type=range]::-moz-range-track{ height:2px; background:var(--rule); }
+
+  /* ── Gate (centered greeting) ─────────────────────────────────────────────── */
+  .gate{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:24px;
+    background:repeating-linear-gradient(0deg,var(--paper),var(--paper) 23px,var(--rule-soft) 23px,var(--rule-soft) 24px); }
+  .gate.hidden{ display:none; }
+  .gate-card{ width:100%; max-width:430px; background:var(--paper); border:1px solid var(--ink); }
+  .gate-head{ padding:22px 24px 18px; border-bottom:1px solid var(--rule); }
+  .gate-head .meta{ font-size:9px; letter-spacing:0.26em; text-transform:uppercase; color:var(--ink-faint); }
+  .gate-head .wordmark{ font-size:23px; font-weight:600; letter-spacing:0.01em; margin-top:7px; line-height:1.15; }
+  .gate-head .sub{ font-size:11px; color:var(--ink-soft); margin-top:18px; line-height:1.55; }
+  .gate-body{ padding:20px 24px 22px; }
+  .gate-body label{ font-size:8.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-faint); }
+  .gate-row{ display:flex; gap:9px; margin-top:7px; }
+  .gate-actions{ display:flex; gap:9px; margin-top:14px; }
+  .gate-actions .tbtn{ flex:1; text-align:center; }
+  .or{ display:flex; align-items:center; gap:12px; margin:16px 0; color:var(--ink-faint); font-size:13px; letter-spacing:0.28em; }
+  .or::before,.or::after{ content:""; flex:1; height:1px; background:var(--rule); }
+  .gate-or-btns{ display:flex; flex-direction:row; gap:9px; }
+  .gate-or-btns .tbtn{ flex:1; width:auto; text-align:center; padding:15px 10px; font-size:11.5px; letter-spacing:0.1em; }
+  .gate-note{ font-size:9.5px; color:var(--ink-faint); margin-top:9px; line-height:1.6; }
+  .gate-status{ font-size:10.5px; color:var(--ink-soft); margin-top:9px; min-height:0; }
+  .gate-status.err{ color:var(--ink); }
+  .gate-status .dots::after{ content:""; animation:dots 1.4s steps(4,end) infinite; }
+  @keyframes dots{ 0%{content:"";} 25%{content:"·";} 50%{content:"· ·";} 75%{content:"· · ·";} 100%{content:"";} }
+
+  /* ── Studio ───────────────────────────────────────────────────────────────── */
+  .studio{ display:none; flex-direction:column; height:100vh; min-height:600px; }
+  .studio.show{ display:flex; }
+  .head{ display:flex; align-items:stretch; justify-content:space-between; border-bottom:1px solid var(--rule); flex:0 0 auto; }
+  .brand{ padding:12px 18px; min-width:264px; border-right:1px solid var(--rule); }
+  .brand .wordmark{ font-size:18px; font-weight:600; letter-spacing:0.01em; }
+  .brand .meta{ font-size:9px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-faint); margin-top:5px; }
+  .head-export{ flex:1 1 auto; min-width:280px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:7px 18px; }
+  .export-topbar{ width:min(540px,100%); display:grid; grid-template-columns:auto minmax(140px,210px) auto; gap:8px; align-items:center; }
+  .export-topbar .ex-label{ font-size:8.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-faint); white-space:nowrap; }
+  .head-export select{ font-size:10.5px; padding:5px 22px 5px 7px; background-position:calc(100% - 12px) 10px,calc(100% - 7px) 10px; }
+  .head-export .tbtn{ padding:6px 12px; }
+  .head-export .ex-info{ width:min(540px,100%); font-size:8.5px; color:var(--ink-faint); line-height:1.35; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .head-export .ex-info b{ color:var(--ink-soft); font-weight:500; }
+  .head-loc{ display:flex; align-items:center; gap:14px; padding:12px 18px; border-left:1px solid var(--rule); }
+  .head-loc .l{ text-align:right; min-width:0; }
+  .head-loc .l .place{ font-size:13px; color:var(--ink); }
+  .head-loc .l .when{ font-size:9.5px; color:var(--ink-faint); letter-spacing:0.04em; text-transform:uppercase; margin-top:2px; }
+
+  .work{ display:grid; grid-template-columns:264px minmax(0,1fr) 348px; flex:1 1 auto; min-height:0; }
+  .work > .col{ overflow-y:auto; min-width:0; min-height:0; }
+  .col.left{ border-right:1px solid var(--rule); }
+  .col.right{ border-left:1px solid var(--rule); }
+  .panel{ border-bottom:1px solid var(--rule); padding:14px 16px; }
+  .panel:last-child{ border-bottom:none; }
+  .panel h2{ margin:0 0 12px; font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--ink); display:flex; gap:8px; align-items:center; }
+  .panel h2 .ix{ color:var(--ink-faint); font-weight:600; }
+  .panel h2 .tag{ margin-left:auto; font-size:8px; letter-spacing:0.12em; border:1px solid var(--rule); padding:2px 6px; color:var(--ink-soft); text-transform:uppercase; }
+
+  /* sea readout */
+  .sea-row{ display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center; padding:6px 0; border-bottom:1px dotted var(--rule-soft); }
+  .sea-row:last-child{ border-bottom:none; }
+  .sea-row .k{ font-size:9.5px; color:var(--ink-soft); letter-spacing:0.04em; }
+  .sea-row .v{ font-size:12px; color:var(--ink); text-align:right; }
+  .spark{ display:block; width:100%; height:30px; margin:9px 0 2px; }
+  .map-note{ font-size:9px; color:var(--ink-faint); line-height:1.6; }
+  .map-note b{ color:var(--ink-soft); font-weight:500; }
+
+  /* center viz */
+  .col.center{ display:flex; flex-direction:column; overflow:hidden; }
+  .viz-plate{ flex:1 1 auto; min-height:0; position:relative; padding:12px 14px 4px; }
+  .viz-plate svg{ width:100%; height:100%; display:block; }
+  .viz-scope{ flex:0 0 auto; height:118px; border-top:1px solid var(--rule); padding:8px 14px 4px; position:relative; }
+  .viz-scope svg{ width:100%; height:100%; display:block; }
+  .viz-scope .lbl{ position:absolute; top:8px; left:14px; font-size:8.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-faint); }
+  .viz-scope .hr{ position:absolute; top:8px; right:14px; font-size:11px; color:var(--ink); }
+  .scrub{ flex:0 0 auto; border-top:1px solid var(--rule); padding:11px 14px; display:flex; align-items:center; gap:13px; }
+  .scrub .cap{ font-size:8.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink-faint); }
+  .scrub input[type=range]{ flex:1 1 auto; }
+  .scrub .fno{ font-size:11px; color:var(--ink); min-width:74px; text-align:right; }
+
+  /* controls */
+  .crow{ display:grid; grid-template-columns:62px 1fr 42px; gap:9px; align-items:center; padding:7px 0; border-bottom:1px dotted var(--rule-soft); }
+  .crow:last-child{ border-bottom:none; }
+  .crow label{ font-size:9px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-soft); }
+  .crow .cv{ font-size:11px; color:var(--ink); text-align:right; }
+  .sub-h{ font-size:8.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-faint); margin:11px 0 3px; padding-bottom:4px; border-bottom:1px solid var(--rule-soft); }
+  .sub-h:first-of-type{ margin-top:2px; }
+  .presets{ display:flex; gap:0; border:1px solid var(--rule); margin-bottom:11px; }
+  .presets button{ flex:1; background:var(--ink-well); border:none; border-right:1px solid var(--rule); color:var(--ink-soft); font-size:9px; letter-spacing:0.04em; text-transform:uppercase; padding:8px 3px; cursor:pointer; }
+  .presets button:last-child{ border-right:none; }
+  .presets button.on{ background:var(--ink); color:var(--paper); }
+
+
+  .col.right{ overflow:hidden; display:flex; flex-direction:column; }
+  .col.right .panel{ padding:12px 14px; flex:0 0 auto; }
+  .shape-panel{ flex:0 1 auto; }
+  .shape-panel h2,.audition-panel h2{ margin-bottom:9px; }
+  .shape-panel .presets{ margin-bottom:9px; }
+  .shape-panel .presets button{ padding:7px 3px; font-size:9.3px; }
+  .shape-panel .sub-h{ margin:7px 0 8px; }
+  .shape-grid{ display:grid; grid-template-columns:1fr 1fr; gap:7px 13px; }
+  .mini-crow{ min-width:0; border-bottom:1px dotted var(--rule-soft); padding:3px 0 7px; }
+  .mini-crow .mini-head{ display:flex; align-items:baseline; justify-content:space-between; gap:9px; margin-bottom:4px; }
+  .mini-crow label{ font-size:9.2px; letter-spacing:0.065em; text-transform:uppercase; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .mini-crow .cv{ font-size:10.5px; color:var(--ink); text-align:right; min-width:28px; }
+  .mini-crow input[type=range]{ height:2px; display:block; }
+  .mini-crow input[type=range]::-webkit-slider-thumb{ width:10px; height:15px; }
+  .mini-crow input[type=range]::-moz-range-thumb{ width:10px; height:15px; }
+  .shape-actions{ display:flex; gap:8px; margin-top:11px; border:1px solid var(--rule); }
+  .shape-actions .tbtn{ flex:1; border:none; border-right:1px solid var(--rule); padding:8px 6px; font-size:9.7px; }
+  .shape-actions .tbtn:last-child{ border-right:none; }
+  .audition-panel{ border-top:1px solid var(--rule); }
+  .audition-panel .transport{ margin-bottom:9px; }
+  .audition-panel .transport button{ padding:10px 4px; }
+  .audition-panel .crow{ padding:6px 0; }
+
+  .transport{ display:flex; border:1px solid var(--rule); margin-bottom:11px; }
+  .transport button{ flex:1; background:var(--ink-well); border:none; border-right:1px solid var(--rule); color:var(--ink); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; padding:11px 4px; cursor:pointer; }
+  .transport button:last-child{ border-right:none; }
+  .transport button:hover:not(:disabled){ background:var(--paper-2); }
+  .transport button.on{ background:var(--ink); color:var(--paper); }
+
+  .fileinfo{ font-size:9.5px; color:var(--ink-faint); line-height:1.7; margin:4px 0 11px; }
+  .fileinfo b{ color:var(--ink-soft); font-weight:500; }
+
+  .logbar{ flex:0 0 auto; border-top:1px solid var(--rule); padding:8px 18px; font-size:10.5px; color:var(--ink-soft); display:flex; gap:10px; align-items:center; }
+  .logbar .tick{ color:var(--ink-faint); } .logbar.warn .msg{ color:var(--ink); }
+  .logbar .msg{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  /* svg viz element styles */
+  .plate-box{ fill:none; stroke:var(--rule); stroke-width:1; }
+  .plate-reg{ stroke:var(--ink-faint); stroke-width:1; }
+  .axis-lbl{ fill:var(--ink-faint); font-size:9px; font-family:var(--f-mono); letter-spacing:0.08em; }
+  .wt{ fill:none; stroke:var(--ink-faint); stroke-width:0.7; opacity:.5; }
+  .wt.cur{ stroke:var(--ink); stroke-width:1.5; opacity:1; }
+  .scope{ fill:none; stroke:var(--ink); stroke-width:1.5; }
+  .scope-mid{ stroke:var(--rule); stroke-width:1; stroke-dasharray:2 4; }
+  .spark-line{ fill:none; stroke:var(--ink); stroke-width:1.2; }
+  .spark-base{ stroke:var(--rule); stroke-width:1; }
+  .spark-now{ fill:var(--ink); }
+
+  @media (max-width:920px){
+    .studio.show{ height:auto; min-height:100vh; }
+    .head{ flex-wrap:wrap; }
+    .brand{ min-width:0; flex:1 1 100%; border-right:none; border-bottom:1px solid var(--rule); }
+    .head-export{ order:3; flex-basis:100%; border-top:1px solid var(--rule); }
+    .head-loc{ flex:1 1 100%; border-left:none; justify-content:space-between; }
+    .work{ grid-template-columns:1fr; }
+    .col.left,.col.right{ border-left:none; border-right:none; border-bottom:1px solid var(--rule); }
+    .col.center{ order:-1; min-height:60vh; }
+  }
+  @media (prefers-reduced-motion:reduce){ *{ animation:none !important; transition:none !important; } }
+</style>
+</head>
+<body>
+
+<!-- ── Gate ─────────────────────────────────────────────────────────────────── -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="gate-head">
+      <div class="meta">Hydroacoustic synthesis · v1.0</div>
+      <div class="wordmark">Your Daily<br>Wavetable</div>
+      <div class="sub">Each day, the sea near you becomes a wavetable. Share or type a location and today's ocean, its swell, temperature, sea level and agitation, is rendered into a morphing wavetable for Serum, Vital, or any wavetable synth.</div>
+    </div>
+    <div class="gate-body">
+      <label>Type location</label>
+      <div class="gate-row"><input type="text" id="gLoc" placeholder="City, or lat, lon (press Enter)" autocomplete="off" /></div>
+      <div class="or">OR</div>
+      <div class="gate-or-btns">
+        <button class="tbtn solid full" id="gShare">Share location</button>
+        <button class="tbtn solid full" id="gRough">Roughest sea</button>
+      </div>
+      <div class="gate-status" id="gStatus"></div>
+      <div class="gate-note">Marine data from Open-Meteo. Coastal and offshore points have the richest data; inland points fall back to an estimated sea state.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Studio ───────────────────────────────────────────────────────────────── -->
+<div class="studio" id="studio">
+  <header class="head">
+    <div class="brand">
+      <div class="wordmark">Your Daily Wavetable</div>
+      <div class="meta">Hydroacoustic synthesis · v1.0</div>
+    </div>
+    <div class="head-export">
+      <div class="export-topbar">
+        <span class="ex-label">06 Export</span>
+        <select id="fmt" aria-label="Export format">
+          <option value="16">16-bit PCM WAV</option>
+          <option value="32">32-bit float WAV</option>
+        </select>
+        <button class="tbtn solid" id="dlBtn">Download .wav</button>
+      </div>
+      <div class="ex-info" id="fileInfo">—</div>
+    </div>
+    <div class="head-loc">
+      <div class="l"><div class="place" id="hPlace">—</div><div class="when" id="hWhen">—</div></div>
+      <button class="tbtn" id="hChange">Change location</button>
+    </div>
+  </header>
+
+  <div class="work">
+    <!-- left: sea state -->
+    <div class="col left">
+      <div class="panel">
+        <h2><span class="ix">01</span> Sea state <span class="tag" id="provTag">—</span></h2>
+        <div class="sea-row"><span class="k">Wave height (max)</span><span class="v" id="sWave">—</span></div>
+        <div class="sea-row"><span class="k">Dominant period</span><span class="v" id="sPeriod">—</span></div>
+        <div class="sea-row"><span class="k">Swell height</span><span class="v" id="sSwell">—</span></div>
+        <div class="sea-row"><span class="k">Wind-wave (chop)</span><span class="v" id="sChop">—</span></div>
+        <div class="sea-row"><span class="k">Surface temp</span><span class="v" id="sTemp">—</span></div>
+        <div class="sea-row"><span class="k">Sea-level range</span><span class="v" id="sLevel">—</span></div>
+        <div class="sea-row"><span class="k">Current</span><span class="v" id="sCur">—</span></div>
+      </div>
+      <div class="panel">
+        <h2><span class="ix">02</span> Today's curves</h2>
+        <div class="map-note" style="margin-bottom:4px"><b>Agitation:</b> wave height over 24h</div>
+        <svg class="spark" id="spkWave" viewBox="0 0 240 30" preserveAspectRatio="none"></svg>
+        <div class="map-note" style="margin:8px 0 4px"><b>Tide:</b> sea level over 24h</div>
+        <svg class="spark" id="spkLevel" viewBox="0 0 240 30" preserveAspectRatio="none"></svg>
+        <div class="map-note" style="margin:8px 0 4px"><b>Warmth:</b> surface temperature</div>
+        <svg class="spark" id="spkTemp" viewBox="0 0 240 30" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="panel">
+        <h2><span class="ix">03</span> How the sea maps</h2>
+        <div class="map-note">
+          <b>Agitation</b> → harmonic brightness & richness<br>
+          <b>Period</b> → ripple / spectral rolloff<br>
+          <b>Swell</b> → low-harmonic body<br>
+          <b>Temperature</b> → warmth & shimmer<br>
+          <b>Sea level</b> → fundamental weight<br>
+          <b>Current</b> → waveform skew<br>
+          <b>The 24 hours</b> → the wavetable's morph axis
+        </div>
+      </div>
+    </div>
+
+    <!-- center: visualization -->
+    <div class="col center">
+      <div class="viz-plate"><svg id="plate" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid meet"></svg></div>
+      <div class="viz-scope">
+        <span class="lbl">Frame waveform</span><span class="hr" id="scopeHr">—</span>
+        <svg id="scope" viewBox="0 0 1000 120" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="scrub">
+        <span class="cap">Position</span>
+        <input type="range" id="frame" min="0" max="255" step="1" value="128" />
+        <span class="fno" id="frameNo">128 / 255</span>
+      </div>
+    </div>
+
+    <!-- right: shape, preview, export -->
+    <div class="col right">
+      <div class="panel shape-panel">
+        <h2><span class="ix">04</span> Shape &amp; distort</h2>
+        <div class="presets" id="presets">
+          <button data-preset="faithful" class="on">Faithful</button>
+          <button data-preset="rough">Rough</button>
+          <button data-preset="storm">Storm</button>
+          <button data-preset="extreme">Extreme</button>
+        </div>
+        <div class="sub-h">Source spectrum · distortion controls</div>
+        <div class="shape-grid">
+          <div class="mini-crow"><div class="mini-head"><label>Tilt</label><span class="cv" id="tiltV">0</span></div><input type="range" id="tilt" min="-100" max="100" value="0"></div>
+          <div class="mini-crow"><div class="mini-head"><label>Harmonics</label><span class="cv" id="harmV">50</span></div><input type="range" id="harm" min="0" max="100" value="50"></div>
+          <div class="mini-crow"><div class="mini-head"><label>Skew</label><span class="cv" id="skewV">0</span></div><input type="range" id="skew" min="-100" max="100" value="0"></div>
+          <div class="mini-crow"><div class="mini-head"><label>Sync</label><span class="cv" id="syncV">0</span></div><input type="range" id="sync" min="0" max="100" value="0"></div>
+          <div class="mini-crow"><div class="mini-head"><label>FM</label><span class="cv" id="fmV">0</span></div><input type="range" id="fm" min="0" max="100" value="0"></div>
+          <div class="mini-crow"><div class="mini-head"><label>Phase</label><span class="cv" id="phaseV">0</span></div><input type="range" id="phase" min="-100" max="100" value="0"></div>
+          <div class="mini-crow"><div class="mini-head"><label>Width</label><span class="cv" id="widthV">0</span></div><input type="range" id="width" min="0" max="100" value="0"></div>
+          <div class="mini-crow"><div class="mini-head"><label>Formant</label><span class="cv" id="formantV">0</span></div><input type="range" id="formant" min="0" max="100" value="0"></div>
+          <div class="mini-crow"><div class="mini-head"><label>Stretch</label><span class="cv" id="stretchV">0</span></div><input type="range" id="stretch" min="0" max="100" value="0"></div>
+          <div class="mini-crow"><div class="mini-head"><label>Smear</label><span class="cv" id="smearV">0</span></div><input type="range" id="smear" min="0" max="100" value="0"></div>
+          <div class="mini-crow"><div class="mini-head"><label>Sub</label><span class="cv" id="subV">0</span></div><input type="range" id="sub" min="0" max="100" value="0"></div>
+          <div class="mini-crow"><div class="mini-head"><label>Drive</label><span class="cv" id="driveV">0</span></div><input type="range" id="drive" min="0" max="100" value="0"></div>
+          <div class="mini-crow"><div class="mini-head"><label>Fold</label><span class="cv" id="foldV">0</span></div><input type="range" id="fold" min="0" max="100" value="0"></div>
+          <div class="mini-crow"><div class="mini-head"><label>Decimate</label><span class="cv" id="decimV">0</span></div><input type="range" id="decim" min="0" max="100" value="0"></div>
+          <div class="mini-crow"><div class="mini-head"><label>Crush</label><span class="cv" id="crushV">0</span></div><input type="range" id="crush" min="0" max="100" value="0"></div>
+          <div class="mini-crow"><div class="mini-head"><label>Turbulence</label><span class="cv" id="turbV">0</span></div><input type="range" id="turb" min="0" max="100" value="0"></div>
+        </div>
+        <div class="shape-actions" aria-label="Shape and distort actions">
+          <button class="tbtn" id="randomShape" type="button">Random</button>
+          <button class="tbtn" id="resetShape" type="button">Reset</button>
+        </div>
+      </div>
+      <div class="panel audition-panel">
+        <h2><span class="ix">05</span> Audition</h2>
+        <div class="transport">
+          <button id="playBtn">Play</button>
+          <button id="sweepBtn">Sweep</button>
+        </div>
+        <div class="crow"><label>Pitch</label>
+          <select id="pitch" style="grid-column:2 / span 2">
+            <option value="32.70">C1 · 32.7 Hz</option>
+            <option value="65.41" selected>C2 · 65.4 Hz</option>
+            <option value="130.81">C3 · 130.8 Hz</option>
+            <option value="261.63">C4 · 261.6 Hz</option>
+          </select>
+        </div>
+        <div class="crow"><label>Volume</label><input type="range" id="vol" min="0" max="100" value="70"><span class="cv" id="volV">70</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="logbar" id="logbar"><span class="tick">≈</span><span class="msg">Wavetable ready.</span></div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════════════
+   YOUR DAILY WAVETABLE
+════════════════════════════════════════════════════════════════════════════ */
+const N=2048, FRAMES=256, SR=44100;
+const clamp=(v,a,b)=> v<a?a:(v>b?b:v);
+const lerp=(a,b,t)=> a+(b-a)*t;
+const pad2=n=>String(n).padStart(2,'0');
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function hashStr(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=(h*16777619)>>>0; } return h>>>0; }
+
+/* offline gazetteer fallback for typed names (coastal-leaning) */
+const CITIES={ 'porto':[41.15,-8.61],'lisbon':[38.72,-9.13],'cascais':[38.70,-9.42],'vigo':[42.24,-8.72],'biarritz':[43.48,-1.56],
+  'lisboa':[38.72,-9.13],'london':[51.51,-0.13],'brighton':[50.82,-0.14],'amsterdam':[52.37,4.90],'bergen':[60.39,5.32],
+  'reykjavik':[64.15,-21.94],'barcelona':[41.39,2.17],'nice':[43.70,7.27],'naples':[40.85,14.27],'athens':[37.98,23.73],
+  'istanbul':[41.01,28.98],'casablanca':[33.57,-7.59],'cape town':[-33.92,18.42],'lagos':[6.45,3.47],'mumbai':[19.08,72.88],
+  'new york':[40.71,-74.01],'boston':[42.36,-71.06],'miami':[25.76,-80.19],'san francisco':[37.77,-122.42],'los angeles':[33.99,-118.48],
+  'seattle':[47.61,-122.33],'vancouver':[49.28,-123.12],'honolulu':[21.31,-157.86],'rio de janeiro':[-22.97,-43.18],'lima':[-12.05,-77.04],
+  'valparaiso':[-33.05,-71.62],'buenos aires':[-34.60,-58.38],'sydney':[-33.87,151.21],'perth':[-31.95,115.86],'auckland':[-36.85,174.76],
+  'tokyo':[35.68,139.69],'osaka':[34.69,135.50],'busan':[35.18,129.08],'hong kong':[22.32,114.17],'singapore':[1.29,103.85],
+  'dubai':[25.20,55.27],'tel aviv':[32.08,34.78],'dublin':[53.35,-6.26],'galway':[53.27,-9.05],'oslo':[59.91,10.75] };
+
+/* notorious rough-sea watch-points — scanned for "today's roughest sea" */
+const ROUGH_POINTS=[
+  {lat:-57.0,lon:-65.0,label:'Drake Passage'},
+  {lat:-46.0,lon:22.0, label:'Southern Ocean · S. of Agulhas'},
+  {lat:-49.0,lon:70.0, label:'Roaring Forties · Kerguelen'},
+  {lat:57.0, lon:-13.5,label:'Rockall · North Atlantic'},
+  {lat:64.5, lon:-28.0,label:'Denmark Strait · Iceland'},
+  {lat:54.0, lon:-158.0,label:'Gulf of Alaska · Aleutians'},
+  {lat:45.5, lon:-6.5, label:'Bay of Biscay'},
+  {lat:39.6, lon:-9.35,label:'Nazaré · Portugal'},
+  {lat:45.0, lon:-130.0,label:'NE Pacific · Cape Mendocino'},
+  {lat:-52.0,lon:169.0,label:'Roaring Forties · S. of NZ'},
+  {lat:-54.0,lon:-37.0,label:'South Georgia · S. Atlantic'},
+  {lat:-45.0,lon:146.0,label:'Tasman Sea · S. of Tasmania'},
+];
+
+/* ── State + DOM ──────────────────────────────────────────────────────────── */
+const state={ loc:null, sea:null, seed:null, frames:null, frame:128, dist:{drive:0,fold:0,crush:0,turb:0,tilt:0,harm:0.5,skew:0,sync:0,decim:0,fm:0,phase:0,width:0,formant:0,stretch:0,smear:0,sub:0}, sweep:false, preset:'faithful' };
+const $=id=>document.getElementById(id);
+const els={};
+['gate','gLoc','gShare','gRough','gStatus','studio','hPlace','hWhen','hChange',
+ 'provTag','sWave','sPeriod','sSwell','sChop','sTemp','sLevel','sCur',
+ 'spkWave','spkLevel','spkTemp','plate','scope','scopeHr','frame','frameNo',
+ 'presets','drive','foldV','fold','driveV','crush','crushV','turb','turbV',
+ 'tilt','tiltV','harm','harmV','skew','skewV','sync','syncV','decim','decimV',
+ 'fm','fmV','phase','phaseV','width','widthV','formant','formantV','stretch','stretchV','smear','smearV','sub','subV',
+ 'randomShape','resetShape','playBtn','sweepBtn','pitch','vol','volV','fmt','fileInfo','dlBtn','logbar'].forEach(id=>els[id]=$(id));
+function log(msg,warn){ els.logbar.className='logbar'+(warn?' warn':''); const m=els.logbar.querySelector('.msg'); if(m) m.textContent=msg; }
+const SVGNS='http://www.w3.org/2000/svg';
+function svgEl(t,a){ const e=document.createElementNS(SVGNS,t); for(const k in a) e.setAttribute(k,a[k]); return e; }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SEA DATA
+════════════════════════════════════════════════════════════════════════════ */
+function fillNulls(arr, fallback){
+  const out=arr.map(v=> (v==null||Number.isNaN(v))?null:+v);
+  if(out.every(v=>v==null)) return out.map(()=>fallback);
+  // forward/backward fill then linear-ish
+  for(let i=0;i<out.length;i++){ if(out[i]==null){ let j=i; while(j<out.length&&out[j]==null) j++; const prev=i>0?out[i-1]:(j<out.length?out[j]:fallback); const next=j<out.length?out[j]:prev; for(let k=i;k<j;k++) out[k]=lerp(prev,next,(k-i+1)/(j-i+1)); i=j; } }
+  return out;
+}
+function first24(a){ return (a||[]).slice(0,24); }
+
+async function geocode(name){
+  const u='https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(name)+'&count=1&language=en&format=json';
+  const r=await fetch(u); if(!r.ok) throw new Error('geocode'); const j=await r.json();
+  if(j.results&&j.results[0]){ const g=j.results[0]; return { lat:g.latitude, lon:g.longitude, label:[g.name,g.admin1,g.country_code].filter(Boolean).join(', ') }; }
+  throw new Error('not found');
+}
+async function fetchMarine(lat,lon){
+  const vars='wave_height,wave_period,wave_direction,swell_wave_height,wind_wave_height,sea_surface_temperature,sea_level_height_msl,ocean_current_velocity';
+  const u='https://marine-api.open-meteo.com/v1/marine?latitude='+lat+'&longitude='+lon+'&hourly='+vars+'&forecast_days=1&timezone=auto&cell_selection=sea';
+  const r=await fetch(u); if(!r.ok) throw new Error('marine'); return r.json();
+}
+function hasMarine(j){ return j&&j.hourly&&Array.isArray(j.hourly.wave_height)&&j.hourly.wave_height.some(v=>v!=null); }
+
+/* normalize either API json or synthetic into a uniform sea state */
+function normalizeSea(h, loc, provenance, dateStr){
+  const waveH=fillNulls(first24(h.wave_height),0.6), period=fillNulls(first24(h.wave_period),7),
+        dir=fillNulls(first24(h.wave_direction),180), swell=fillNulls(first24(h.swell_wave_height),0.4),
+        wind=fillNulls(first24(h.wind_wave_height),0.4), sst=fillNulls(first24(h.sea_surface_temperature), estTemp(loc.lat)),
+        level=fillNulls(first24(h.sea_level_height_msl),0), cur=fillNulls(first24(h.ocean_current_velocity),0.2);
+  while(waveH.length<24) waveH.push(waveH[waveH.length-1]??0.6);
+  const lMin=Math.min(...level), lMax=Math.max(...level), lSpan=(lMax-lMin)||1;
+  const norm={
+    rough: waveH.map(v=>clamp(v/4,0,1)),
+    period:period.map(v=>clamp((v-2)/14,0,1)),
+    swell: swell.map(v=>clamp(v/3,0,1)),
+    chop:  wind.map(v=>clamp(v/2.5,0,1)),
+    temp:  sst.map(v=>clamp((v-2)/28,0,1)),
+    level: level.map(v=>clamp((v-lMin)/lSpan,0,1)),
+    dir:   dir.map(v=>((v%360)+360)%360/360),
+    cur:   cur.map(v=>clamp(v/2,0,1)),
+  };
+  return { loc, provenance, dateStr, raw:{waveH,period,dir,swell,wind,sst,level,cur,lMin,lMax}, norm };
+}
+function estTemp(lat){ const a=Math.abs(lat); return clamp(28 - a/90*30, -1, 30); }
+
+/* deterministic estimated sea (no marine coverage / offline) */
+function syntheticSea(loc, date){
+  const seed=hashStr(date.toDateString()+'|'+loc.lat.toFixed(2)+'|'+loc.lon.toFixed(2));
+  const r=mulberry32(seed);
+  const baseWave=0.5+Math.abs(loc.lat)/90*1.7+r()*1.1, swellBase=baseWave*0.55, tideAmp=0.4+r()*1.0, tidePh=r()*Math.PI*2;
+  const sstBase=estTemp(loc.lat)+( r()*4-2 ), curBase=0.15+r()*0.7, dirBase=r()*360;
+  const h={ wave_height:[],wave_period:[],wave_direction:[],swell_wave_height:[],wind_wave_height:[],sea_surface_temperature:[],sea_level_height_msl:[],ocean_current_velocity:[] };
+  for(let t=0;t<24;t++){
+    const diurnal=0.5+0.5*Math.sin(2*Math.PI*(t-9)/24);              // afternoon build-up
+    const gust=0.85+0.3*Math.sin(2*Math.PI*t/3.3 + seed%7);
+    h.wave_height.push(+(baseWave*(0.6+0.7*diurnal)*gust).toFixed(2));
+    h.wave_period.push(+(5+6*(0.5+0.5*Math.sin(2*Math.PI*(t-6)/24))).toFixed(1));
+    h.wave_direction.push(+((dirBase+t*4)%360).toFixed(0));
+    h.swell_wave_height.push(+(swellBase*(0.8+0.4*Math.sin(2*Math.PI*(t-3)/24))).toFixed(2));
+    h.wind_wave_height.push(+(baseWave*0.5*(0.4+0.9*diurnal)).toFixed(2));
+    h.sea_surface_temperature.push(+(sstBase+1.4*Math.sin(2*Math.PI*(t-15)/24)).toFixed(1));
+    h.sea_level_height_msl.push(+(tideAmp*Math.sin(2*Math.PI*t/12.42 + tidePh)).toFixed(2));     // semidiurnal tide
+    h.ocean_current_velocity.push(+(curBase*(0.6+0.6*Math.abs(Math.sin(2*Math.PI*t/12.42+tidePh)))).toFixed(2));
+  }
+  return normalizeSea(h, loc, 'estimated', date.toDateString());
+}
+
+function makeSeed(sea){
+  const s=hashStr(sea.dateStr+'|'+sea.loc.lat.toFixed(2)+'|'+sea.loc.lon.toFixed(2)+'|'+sea.provenance);
+  const r=mulberry32(s);
+  const phase=new Float32Array(200), tFreq=new Float32Array(40), tPhase=new Float32Array(40);
+  for(let i=0;i<200;i++) phase[i]=r()*Math.PI*2;
+  for(let i=0;i<40;i++){ tFreq[i]=1.5+r()*60; tPhase[i]=r()*Math.PI*2; }
+  return { phase, tFreq, tPhase };
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SYNTHESIS
+════════════════════════════════════════════════════════════════════════════ */
+function paramAt(arr, t){ const x=clamp(t,0,1)*23, i=Math.floor(x), f=x-i; return lerp(arr[i], arr[Math.min(23,i+1)], f); }
+
+function distortSample(x, d){
+  if(d.drive>0){ const g=1+d.drive*9; x=Math.tanh(x*g)/Math.tanh(g); }
+  if(d.fold>0){ let y=x*(1+d.fold*4); for(let i=0;i<8&&(y>1||y<-1);i++){ if(y>1) y=2-y; else if(y<-1) y=-2-y; } x=y; }
+  if(d.crush>0){ const bits=Math.round(lerp(16,3,d.crush)), levels=Math.pow(2,bits-1); x=Math.round(x*levels)/levels; }
+  return x;
+}
+
+function buildFrame(f, dist, sea, seed){
+  const t=f/(FRAMES-1), nz=sea.norm;
+  const rough=paramAt(nz.rough,t), period=paramAt(nz.period,t), swell=paramAt(nz.swell,t),
+        chop=paramAt(nz.chop,t), temp=paramAt(nz.temp,t), level=paramAt(nz.level,t),
+        dir=paramAt(nz.dir,t), cur=paramAt(nz.cur,t);
+  // base spectral shape from the sea
+  let K=Math.round(lerp(4,90, clamp(0.18+0.85*rough+0.35*chop,0,1)));
+  let rolloff=lerp(2.6,0.78, clamp(0.28+0.5*temp+0.45*rough,0,1));
+  const swellBoost=swell, asym=(dir-0.5)*1.2 + cur*0.5, fundAmp=0.65+0.6*level;
+  // ── user source-spectrum controls (neutral at tilt0 / harm0.5 / skew0 / sync0) ──
+  const tilt=dist.tilt||0, harm=(dist.harm==null?0.5:dist.harm), skew=dist.skew||0, sync=dist.sync||0,
+        fm=dist.fm||0, phase=dist.phase||0, width=dist.width||0, formant=dist.formant||0,
+        stretch=dist.stretch||0, smear=dist.smear||0, sub=dist.sub||0;
+  rolloff=clamp(rolloff - tilt*1.5, 0.2, 4.2);                       // + brightens, − darkens
+  const Kmul = harm<=0.5 ? lerp(0.4,1,harm*2) : lerp(1,2.4,(harm-0.5)*2);
+  K=clamp(Math.round(K*Kmul), 2, 240);
+  const cycleMul = 1 + sync*3;                                       // hard-sync style cycle multiply
+  const formA=lerp(4,14,temp), formB=lerp(13,46,rough+chop*0.25), smearAmt=smear*1.8;
+  const buf=new Float32Array(N);
+  for(let n=0;n<N;n++){
+    const tt=n/N;
+    let pc = tt*cycleMul; pc = pc - Math.floor(pc);                  // sync wrap
+    if(width>0){                                                    // pulse-width style phase window
+      const pw=clamp(lerp(0.5,0.08,width),0.06,0.94);
+      pc = pc<pw ? (pc/pw)*0.5 : 0.5+((pc-pw)/(1-pw))*0.5;
+    }
+    let tw = pc;
+    if(fm>0) tw += fm*0.22*Math.sin(2*Math.PI*(2+rough*5)*pc + seed.phase[17]);
+    if(phase!==0) tw += phase*0.22*Math.sin(2*Math.PI*pc)*Math.abs(Math.sin(2*Math.PI*pc));
+    if(skew!==0) tw += skew*0.3*Math.sin(2*Math.PI*pc);             // phase skew (PD-like)
+    tw = ((tw%1)+1)%1;
+    let s=0;
+    for(let k=1;k<=K;k++){
+      const kh = stretch>0 ? Math.pow(k,1+stretch*0.35) : k;
+      let amp=1/Math.pow(k,rolloff);
+      if(k===1) amp*=fundAmp*(1+sub*2.4);
+      if(k===2) amp*=(1+sub*1.2);
+      if(k===3) amp*=(1+sub*0.55);
+      if(k<=2) amp*=(1+1.4*swellBoost);
+      if(formant>0){
+        const a=Math.exp(-Math.pow(k-formA,2)/(2*18));
+        const b=Math.exp(-Math.pow(k-formB,2)/(2*62));
+        amp *= 1 + formant*(1.6*a + 1.1*b);
+      }
+      const ph=2*Math.PI*kh*tw + asym*(k*0.16) + seed.phase[k%200]*(chop*0.85 + smearAmt*(k/K));
+      s+=amp*Math.sin(ph);
+    }
+    if(sub>0) s+=sub*0.55*Math.sin(2*Math.PI*tw);
+    if(dist.turb>0){ const nT=Math.round(dist.turb*16);
+      for(let j=0;j<nT;j++){ const amp=dist.turb*0.4/(j+1); s+=amp*Math.sin(2*Math.PI*seed.tFreq[j]*tt+seed.tPhase[j]); } }
+    buf[n]=s;
+  }
+  // ── decimate (sample-rate reduction / stairs) ──
+  if(dist.decim>0){ const step=1+Math.round(dist.decim*31); for(let n=0;n<N;n++) buf[n]=buf[Math.floor(n/step)*step]; }
+  if(dist.drive>0||dist.fold>0||dist.crush>0){ for(let n=0;n<N;n++) buf[n]=distortSample(buf[n],dist); }
+  let max=0; for(let n=0;n<N;n++){ const a=Math.abs(buf[n]); if(a>max) max=a; }
+  if(max>1e-6){ const g=0.98/max; for(let n=0;n<N;n++) buf[n]*=g; }
+  return buf;
+}
+function buildAllFrames(dist, sea, seed){ const fr=new Array(FRAMES); for(let f=0;f<FRAMES;f++) fr[f]=buildFrame(f,dist,sea,seed); return fr; }
+function buildTable(frames){ const out=new Float32Array(N*FRAMES); for(let f=0;f<FRAMES;f++) out.set(frames[f], f*N); return out; }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   WAV ENCODE (RIFF + Serum "clm " chunk)
+════════════════════════════════════════════════════════════════════════════ */
+function strBytes(s){ return [...s].map(c=>c.charCodeAt(0)&0xff); }
+function encodeWav(table, opts){
+  const o=Object.assign({ sampleRate:SR, bits:16, frameSize:N, name:'Your Daily Wavetable' }, opts||{});
+  const num=table.length, bytesPer=o.bits/8, dataSize=num*bytesPer, audioFormat=o.bits===32?3:1;
+  let clm=strBytes('<!>'+o.frameSize+' 00000000 wavetable ('+o.name+')'); if(clm.length%2) clm=[...clm,0];
+  const fmtSize=16, riff=4+(8+fmtSize)+(8+clm.length)+(8+dataSize);
+  const buf=new ArrayBuffer(8+riff), dv=new DataView(buf); let p=0;
+  const ws=s=>{ for(let i=0;i<s.length;i++) dv.setUint8(p++,s.charCodeAt(i)); };
+  ws('RIFF'); dv.setUint32(p,riff,true); p+=4; ws('WAVE');
+  ws('fmt '); dv.setUint32(p,fmtSize,true); p+=4;
+  dv.setUint16(p,audioFormat,true); p+=2; dv.setUint16(p,1,true); p+=2;
+  dv.setUint32(p,o.sampleRate,true); p+=4; dv.setUint32(p,o.sampleRate*bytesPer,true); p+=4;
+  dv.setUint16(p,bytesPer,true); p+=2; dv.setUint16(p,o.bits,true); p+=2;
+  ws('clm '); dv.setUint32(p,clm.length,true); p+=4; for(const b of clm) dv.setUint8(p++,b);
+  ws('data'); dv.setUint32(p,dataSize,true); p+=4;
+  if(o.bits===16){ for(let i=0;i<num;i++){ const s=clamp(table[i],-1,1); dv.setInt16(p, s<0?s*32768:s*32767, true); p+=2; } }
+  else { for(let i=0;i<num;i++){ dv.setFloat32(p, clamp(table[i],-1,1), true); p+=4; } }
+  return buf;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   VISUALIZATION
+════════════════════════════════════════════════════════════════════════════ */
+function frameHourLabel(f){ const m=f/(FRAMES-1)*24*60; return pad2(Math.floor(m/60)%24)+':'+pad2(Math.floor(m%60)); }
+function downsample(frame, P){ const out=new Float32Array(P); for(let i=0;i<P;i++){ out[i]=frame[Math.floor(i/(P-1)*(N-1))]; } return out; }
+
+function renderPlate(){
+  const svg=els.plate; svg.innerHTML=''; if(!state.frames) return;
+  const W=1000,H=560, padL=70,padT=26, plotW=820, rowSpan=H*0.60, waveH=78, skew=120, M=46, P=150;
+  svg.appendChild(svgEl('rect',{x:24,y:14,width:W-48,height:H-28,class:'plate-box'}));
+  [[40,30],[W-40,30],[40,H-30],[W-40,H-30]].forEach(([cx,cy])=>{ svg.appendChild(svgEl('line',{x1:cx-7,y1:cy,x2:cx+7,y2:cy,class:'plate-reg'})); svg.appendChild(svgEl('line',{x1:cx,y1:cy-7,x2:cx,y2:cy+7,class:'plate-reg'})); });
+  const hours=[0,6,12,18,24];
+  hours.forEach(hr=>{ const i=hr/24; const y=padT+i*rowSpan+waveH*0.5; const t=svgEl('text',{x:34,y:y+3,class:'axis-lbl'}); t.textContent=pad2(hr%24)+':00'; svg.appendChild(t); });
+  const curIdx=state.frame;
+  for(let m=0;m<M;m++){
+    const idx=Math.round(m/(M-1)*(FRAMES-1)), fr=downsample(state.frames[idx],P);
+    const i=m/(M-1), ox=padL+i*skew, oy=padT+i*rowSpan, ww=plotW-skew;
+    let d='M'; for(let n=0;n<P;n++){ const x=ox+(n/(P-1))*ww, y=oy+waveH*0.5-fr[n]*waveH*0.5; d+=(n?' L':'')+x.toFixed(1)+' '+y.toFixed(1); }
+    const isCur=Math.abs(idx-curIdx)<=Math.ceil((FRAMES-1)/(M-1)/2);
+    svg.appendChild(svgEl('path',{d,class:'wt'+(isCur?' cur':'')}));
+  }
+}
+function renderScope(){
+  const svg=els.scope; svg.innerHTML=''; if(!state.frames) return;
+  const W=1000,H=120, mid=H/2; svg.appendChild(svgEl('line',{x1:0,y1:mid,x2:W,y2:mid,class:'scope-mid'}));
+  const fr=state.frames[state.frame], P=600; let d='M';
+  for(let i=0;i<P;i++){ const n=Math.floor(i/(P-1)*(N-1)); const x=i/(P-1)*W, y=mid-fr[n]*(H*0.44); d+=(i?' L':'')+x.toFixed(1)+' '+y.toFixed(1); }
+  svg.appendChild(svgEl('path',{d,class:'scope'}));
+  els.scopeHr.textContent=frameHourLabel(state.frame);
+}
+function sparkPath(svg, arr, withNow){
+  svg.innerHTML=''; const W=240,H=30, mn=Math.min(...arr), mx=Math.max(...arr), sp=(mx-mn)||1;
+  svg.appendChild(svgEl('line',{x1:0,y1:H-1,x2:W,y2:H-1,class:'spark-base'}));
+  let d='M'; for(let i=0;i<arr.length;i++){ const x=i/(arr.length-1)*W, y=H-2-((arr[i]-mn)/sp)*(H-4); d+=(i?' L':'')+x.toFixed(1)+' '+y.toFixed(1); }
+  svg.appendChild(svgEl('path',{d,class:'spark-line'}));
+  if(withNow){ const t=state.frame/(FRAMES-1); const x=t*W; const i=clamp(Math.round(t*23),0,23); const y=H-2-((arr[i]-mn)/sp)*(H-4); svg.appendChild(svgEl('circle',{cx:x.toFixed(1),cy:y.toFixed(1),r:2.4,class:'spark-now'})); }
+}
+function renderSparks(){ const raw=state.sea.raw; sparkPath(els.spkWave,raw.waveH,true); sparkPath(els.spkLevel,raw.level,true); sparkPath(els.spkTemp,raw.sst,true); }
+
+function updateFileInfo(){
+  const bits=parseInt(els.fmt.value,10), bytes=N*FRAMES*(bits/8)+200;
+  els.fileInfo.innerHTML='<b>'+FRAMES+'</b> frames × <b>'+N+'</b> samples · '+bits+'-bit · ~<b>'+(bytes/1048576).toFixed(2)+' MB</b> · Serum frame size 2048';
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PREVIEW (native Web Audio: one oscillator, live PeriodicWave morph)
+════════════════════════════════════════════════════════════════════════════ */
+let actx=null, osc=null, ampGain=null, playing=false, pwCache={}, sweepRAF=null, sweepT=0;
+function framePeriodicWave(frame){
+  const Hh=Math.min(256, N/2-1), real=new Float32Array(Hh+1), imag=new Float32Array(Hh+1);
+  for(let k=1;k<=Hh;k++){ let re=0,im=0; for(let n=0;n<N;n++){ const a=2*Math.PI*k*n/N; re+=frame[n]*Math.cos(a); im-=frame[n]*Math.sin(a); } real[k]=re*2/N; imag[k]=im*2/N; }
+  return actx.createPeriodicWave(real, imag, {disableNormalization:false});
+}
+function getPW(idx){ if(pwCache[idx]) return pwCache[idx]; const pw=framePeriodicWave(state.frames[idx]); pwCache[idx]=pw; return pw; }
+function ensureAudio(){
+  if(actx) return;
+  actx=new (window.AudioContext||window.webkitAudioContext)();
+  ampGain=actx.createGain(); ampGain.gain.value=0; ampGain.connect(actx.destination);
+  osc=actx.createOscillator(); osc.setPeriodicWave(getPW(state.frame)); osc.frequency.value=parseFloat(els.pitch.value); osc.connect(ampGain); osc.start();
+}
+function applyPW(){ if(osc&&state.frames) osc.setPeriodicWave(getPW(state.frame)); }
+async function togglePlay(){
+  ensureAudio(); if(actx.state==='suspended') await actx.resume();
+  playing=!playing; els.playBtn.classList.toggle('on',playing); els.playBtn.textContent=playing?'Stop':'Play';
+  const v=parseInt(els.vol.value,10)/100*0.5;
+  ampGain.gain.cancelScheduledValues(actx.currentTime);
+  ampGain.gain.linearRampToValueAtTime(playing?v:0, actx.currentTime+0.03);
+  if(playing){ applyPW(); log('Auditioning frame '+state.frame+' ('+frameHourLabel(state.frame)+').'); } else log('Stopped.');
+}
+function toggleSweep(){
+  state.sweep=!state.sweep; els.sweepBtn.classList.toggle('on',state.sweep);
+  if(state.sweep){ sweepT=performance.now(); const step=now=>{ if(!state.sweep) return; const el=(now-sweepT)/6000; const idx=Math.floor((el%1)*(FRAMES-1)); setFrame(idx,true); sweepRAF=requestAnimationFrame(step); }; sweepRAF=requestAnimationFrame(step); log('Sweeping through the day.'); }
+  else { if(sweepRAF) cancelAnimationFrame(sweepRAF); sweepRAF=null; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   FRAME / BUILD / WIRING
+════════════════════════════════════════════════════════════════════════════ */
+function setFrame(idx, fromSweep){
+  state.frame=clamp(idx|0,0,FRAMES-1);
+  els.frame.value=state.frame; els.frameNo.textContent=state.frame+' / 255';
+  renderPlate(); renderScope(); renderSparks();
+  if(playing) applyPW();
+}
+let rebuildTimer=null;
+function scheduleRebuild(){ if(rebuildTimer) clearTimeout(rebuildTimer); rebuildTimer=setTimeout(rebuild,110); }
+function rebuild(){
+  if(!state.sea) return;
+  state.frames=buildAllFrames(state.dist, state.sea, state.seed);
+  pwCache={}; if(playing) applyPW();
+  renderPlate(); renderScope(); renderSparks(); updateFileInfo();
+}
+
+function showSeaReadout(){
+  const sea=state.sea, raw=sea.raw;
+  els.provTag.textContent = sea.roughestOf ? 'Roughest today' : (sea.provenance==='live'?'Live data':'Estimated');
+  const mx=a=>Math.max(...a), mean=a=>a.reduce((s,x)=>s+x,0)/a.length;
+  els.sWave.textContent=mx(raw.waveH).toFixed(2)+' m';
+  els.sPeriod.textContent=mean(raw.period).toFixed(1)+' s';
+  els.sSwell.textContent=mx(raw.swell).toFixed(2)+' m';
+  els.sChop.textContent=mx(raw.wind).toFixed(2)+' m';
+  els.sTemp.textContent=mean(raw.sst).toFixed(1)+' °C';
+  els.sLevel.textContent=(raw.lMin).toFixed(2)+' → '+(raw.lMax).toFixed(2)+' m';
+  els.sCur.textContent=mx(raw.cur).toFixed(2)+' m/s';
+  els.hPlace.textContent=sea.loc.label;
+  els.hWhen.textContent=sea.dateStr+(sea.provenance==='live'?' · live sea':' · estimated sea');
+}
+
+function enterStudio(){
+  state.seed=makeSeed(state.sea);
+  rebuild(); showSeaReadout(); setFrame(128);
+  els.gate.classList.add('hidden'); els.studio.classList.add('show');
+  log('Today\u2019s sea over '+state.sea.loc.label+' rendered into a '+FRAMES+'-frame wavetable.');
+}
+
+function gateStatus(msg, err, loading){ els.gStatus.className='gate-status'+(err?' err':''); els.gStatus.innerHTML= loading? (msg+' <span class="dots"></span>') : msg; }
+function withTimeout(promise, ms){ return Promise.race([ promise, new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')), ms)) ]); }
+
+/* scan the rough-sea watch-points and load whichever is wildest today */
+function roughScore(h){ const wh=(h.wave_height||[]).filter(v=>v!=null), ww=(h.wind_wave_height||[]).filter(v=>v!=null);
+  return (wh.length?Math.max(...wh):0) + 0.4*(ww.length?Math.max(...ww):0); }
+async function findRoughest(){
+  els.gShare.disabled=els.gRough.disabled=true;
+  try{
+    gateStatus('Scanning '+ROUGH_POINTS.length+' maritime watch-points',false,true);
+    const res=await Promise.allSettled(ROUGH_POINTS.map(async p=>{
+      const j=await withTimeout(fetchMarine(p.lat,p.lon), 9000);
+      if(!hasMarine(j)) throw new Error('nodata');
+      return { p, h:j.hourly, score:roughScore(j.hourly) };
+    }));
+    const good=res.filter(r=>r.status==='fulfilled').map(r=>r.value).sort((a,b)=>b.score-a.score);
+    if(good.length){
+      const top=good[0];
+      const sea=normalizeSea(top.h, {lat:top.p.lat,lon:top.p.lon,label:top.p.label}, 'live', new Date().toDateString());
+      sea.roughestOf=good.length; sea.score=top.score; state.loc=top.p; state.sea=sea; enterStudio(); return;
+    }
+    // offline / blocked: pick the synthetically roughest point (deterministic)
+    const synth=ROUGH_POINTS.map(p=>{ const s=syntheticSea(p,new Date()); return { s, score:Math.max(...s.raw.waveH) }; }).sort((a,b)=>b.score-a.score)[0];
+    synth.s.roughestOf=ROUGH_POINTS.length; state.loc=synth.s.loc; state.sea=synth.s;
+    gateStatus('No live data reachable. Using an estimated roughest sea.',false); enterStudio();
+  } finally { els.gShare.disabled=els.gRough.disabled=false; }
+}
+
+async function resolveAndEnter(rawText, shared){
+  els.gShare.disabled=true; els.gRough.disabled=true;
+  let loc=null;
+  try{
+    if(shared){ loc=shared; }
+    else {
+      const t=(rawText||'').trim(); if(!t){ gateStatus('Type a city or coordinates first.',true); return; }
+      const m=t.match(/^\s*(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)\s*$/);
+      if(m){ loc={ lat:parseFloat(m[1]), lon:parseFloat(m[2]), label:(+m[1]).toFixed(2)+', '+(+m[2]).toFixed(2) }; }
+      else {
+        gateStatus('Locating '+t+'…',false,true);
+        try{ loc=await geocode(t); }
+        catch(e){ const key=t.toLowerCase(); if(CITIES[key]) loc={lat:CITIES[key][0],lon:CITIES[key][1],label:t.replace(/\b\w/g,c=>c.toUpperCase())};
+          else { for(const c in CITIES){ if(c.includes(key)&&key.length>=3){ loc={lat:CITIES[c][0],lon:CITIES[c][1],label:c.replace(/\b\w/g,ch=>ch.toUpperCase())}; break; } } } }
+      }
+    }
+    if(!loc){ gateStatus('Couldn\u2019t place that location. Try a coastal city or “lat, lon”.',true); return; }
+    state.loc=loc;
+    gateStatus('Reading today\u2019s sea near '+loc.label+'…',false,true);
+    let sea=null;
+    try{ const j=await fetchMarine(loc.lat,loc.lon); if(hasMarine(j)){ sea=normalizeSea(j.hourly, {lat:loc.lat,lon:loc.lon,label:loc.label}, 'live', new Date().toDateString()); } }
+    catch(e){ /* network/CORS — fall through to estimate */ }
+    if(!sea){ sea=syntheticSea({lat:loc.lat,lon:loc.lon,label:loc.label}, new Date()); gateStatus('No live marine data here. Using an estimated sea state.',false); }
+    state.sea=sea; enterStudio();
+  } finally { els.gShare.disabled=false; els.gRough.disabled=false; }
+}
+
+/* presets — slider units; bipolar tilt/skew in -100..100, harm 0..100 (50=neutral) */
+const SHAPE_KEYS=['tilt','harm','skew','sync','fm','phase','width','formant','stretch','smear','sub','drive','fold','decim','crush','turb'];
+const PRESETS={
+  faithful:{tilt:0,  harm:50, skew:0,  sync:0,  fm:0,  phase:0,  width:0,  formant:0,  stretch:0,  smear:0,  sub:0,  drive:0,  fold:0,  decim:0,  crush:0,  turb:0},
+  rough:   {tilt:15, harm:60, skew:10, sync:0,  fm:8,  phase:10, width:12, formant:8,  stretch:5,  smear:8,  sub:12, drive:35, fold:15, decim:10, crush:8,  turb:25},
+  storm:   {tilt:30, harm:72, skew:25, sync:20, fm:22, phase:24, width:30, formant:25, stretch:18, smear:25, sub:24, drive:60, fold:40, decim:25, crush:22, turb:50},
+  extreme: {tilt:45, harm:85, skew:45, sync:55, fm:45, phase:42, width:55, formant:48, stretch:42, smear:55, sub:44, drive:88, fold:72, decim:55, crush:48, turb:82},
+};
+function syncDistFromSlider(k){
+  const v=parseInt(els[k].value,10);
+  state.dist[k] = (k==='harm') ? v/100 : v/100;   // harm uses 0..1 (0.5 neutral); bipolar tilt/skew map to -1..1
+}
+function applyPreset(name){
+  state.preset=name; const p=PRESETS[name];
+  SHAPE_KEYS.forEach(k=>{ els[k].value=p[k]; els[k+'V'].textContent=p[k]; syncDistFromSlider(k); });
+  [...els.presets.children].forEach(b=>b.classList.toggle('on',b.dataset.preset===name));
+  scheduleRebuild();
+}
+
+function randomizeShape(){
+  SHAPE_KEYS.forEach(k=>{
+    const input=els[k]; if(!input) return;
+    const min=parseInt(input.min||'0',10), max=parseInt(input.max||'100',10);
+    const v=Math.round(min+Math.random()*(max-min));
+    input.value=v; els[k+'V'].textContent=v; syncDistFromSlider(k);
+  });
+  state.preset='custom';
+  [...els.presets.children].forEach(b=>b.classList.remove('on'));
+  scheduleRebuild();
+  log('Randomized shape and distortion values.');
+}
+function resetShape(){
+  applyPreset('faithful');
+  log('Shape and distortion values reset.');
+}
+
+/* ── Wiring ───────────────────────────────────────────────────────────────── */
+els.gLoc.addEventListener('keydown',e=>{ if(e.key==='Enter') resolveAndEnter(els.gLoc.value,null); });
+els.gShare.addEventListener('click',()=>{
+  if(!navigator.geolocation){ gateStatus('This browser can\u2019t share location. Type a city instead.',true); return; }
+  gateStatus('Requesting your location…',false,true);
+  navigator.geolocation.getCurrentPosition(
+    pos=>resolveAndEnter(null,{lat:pos.coords.latitude,lon:pos.coords.longitude,label:'Your location ('+pos.coords.latitude.toFixed(2)+', '+pos.coords.longitude.toFixed(2)+')'}),
+    err=>gateStatus('Location unavailable ('+(err.code===1?'permission denied':'error')+'). Type a city instead.',true),
+    {enableHighAccuracy:false,timeout:8000,maximumAge:600000}
+  );
+});
+els.gRough.addEventListener('click',findRoughest);
+els.hChange.addEventListener('click',()=>{ if(playing) togglePlay(); if(state.sweep) toggleSweep(); els.studio.classList.remove('show'); els.gate.classList.remove('hidden'); gateStatus(''); });
+
+els.frame.addEventListener('input',()=>{ if(state.sweep) toggleSweep(); setFrame(parseInt(els.frame.value,10)); });
+SHAPE_KEYS.forEach(k=>els[k].addEventListener('input',()=>{ els[k+'V'].textContent=els[k].value; syncDistFromSlider(k);
+  state.preset='custom'; [...els.presets.children].forEach(b=>b.classList.remove('on')); scheduleRebuild(); }));
+[...els.presets.children].forEach(b=>b.addEventListener('click',()=>applyPreset(b.dataset.preset)));
+els.randomShape.addEventListener('click',randomizeShape);
+els.resetShape.addEventListener('click',resetShape);
+
+els.playBtn.addEventListener('click',togglePlay);
+els.sweepBtn.addEventListener('click',toggleSweep);
+els.pitch.addEventListener('change',()=>{ if(osc) osc.frequency.value=parseFloat(els.pitch.value); });
+els.vol.addEventListener('input',()=>{ els.volV.textContent=els.vol.value; if(playing&&ampGain) ampGain.gain.linearRampToValueAtTime(parseInt(els.vol.value,10)/100*0.5, actx.currentTime+0.03); });
+els.fmt.addEventListener('change',updateFileInfo);
+
+els.dlBtn.addEventListener('click',()=>{
+  if(!state.frames){ log('Render a wavetable first.',true); return; }
+  const table=buildTable(state.frames), bits=parseInt(els.fmt.value,10);
+  const name='Daily Sea '+(state.sea.loc.label.split(',')[0]);
+  const buf=encodeWav(table,{bits, name});
+  const blob=new Blob([buf],{type:'audio/wav'}), url=URL.createObjectURL(blob), a=document.createElement('a');
+  const slug=(state.sea.loc.label.split(',')[0]||'sea').toLowerCase().replace(/[^a-z0-9]+/g,'-');
+  a.href=url; a.download='daily-wavetable-'+slug+'.wav'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1500);
+  log('Exported '+bits+'-bit WAV · '+FRAMES+'×'+N+' frames. Import into Serum with frame size 2048.');
+});
+
+/* ── Boot ─────────────────────────────────────────────────────────────────── */
+els.gLoc.value='Porto';
+updateFileInfo();
+
+/* expose pure logic for offline testing */
+if(typeof window!=='undefined') window.__wt={ N,FRAMES,buildFrame,buildAllFrames,buildTable,encodeWav,syntheticSea,normalizeSea,paramAt,distortSample,makeSeed,fillNulls,ROUGH_POINTS,roughScore };
+</script>
+</body>
+</html>
