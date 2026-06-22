@@ -4,11 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Sonification Suite</title>
-  <meta name="description" content="Sonification Suite is a collection of browser-based HTML instruments that turn maps, constellations, and sea-state data into MIDI, audio, and wavetables." />
-  <meta name="keywords" content="sonification, data sonification, map to midi, sky to midi, wavetable, Web Audio API, generative music, browser instrument, creative coding, MIDI export, WAV export" />
+  <meta name="description" content="Sonification Suite is a compact collection of browser-based HTML instruments that turn maps, constellations, movement, and sea-state data into MIDI, audio, video exports, and wavetables." />
+  <meta name="keywords" content="sonification, data sonification, motion to midi, map to midi, sky to midi, wavetable, Web Audio API, generative music, browser instrument, creative coding, MIDI export, audio export, video export" />
   <meta name="author" content="Ruben Silva" />
   <meta property="og:title" content="Sonification Suite" />
-  <meta property="og:description" content="Maps become melodies. Stars become phrases. The sea becomes a waveform." />
+  <meta property="og:description" content="Maps become melodies. Stars become phrases. Motion becomes sound. The sea becomes a waveform." />
   <meta property="og:type" content="website" />
   <style>
 :root{--ink:#f5f2e8;--muted:rgba(245,242,232,.72);--line:rgba(245,242,232,.38);--panel:rgba(0,0,0,.18);--soft:rgba(245,242,232,.08);--shadow:rgba(0,0,0,.50)}
@@ -18,39 +18,38 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:rep
 a{color:inherit;text-decoration:none}.page{position:relative;z-index:1;width:min(1180px,calc(100vw - 28px));margin:18px auto;border:1px solid var(--line);background:rgba(0,0,0,.10);box-shadow:0 28px 90px var(--shadow);backdrop-filter:blur(1.4px)}
 header{min-height:62px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 22px;border-bottom:1px solid var(--line);text-transform:uppercase;letter-spacing:.18em;font-size:12px;color:var(--muted)}
 .brand,.meta{display:flex;align-items:center;gap:14px;white-space:nowrap}.mark{color:var(--ink);font-size:22px;letter-spacing:-6px}
-.hero{display:grid;grid-template-columns:1fr auto;gap:clamp(28px,5vw,72px);align-items:end;padding:clamp(42px,7vw,92px) clamp(24px,6vw,76px);border-bottom:1px solid var(--line)}
+.hero{display:grid;grid-template-columns:1fr minmax(260px,330px);gap:clamp(28px,5vw,72px);align-items:end;padding:clamp(42px,7vw,92px) clamp(24px,6vw,76px);border-bottom:1px solid var(--line)}
 h1{margin:0;font-family:Impact,"Arial Narrow","Helvetica Neue Condensed Bold",sans-serif;font-size:clamp(70px,13vw,166px);line-height:.82;text-transform:uppercase;letter-spacing:-.055em;text-shadow:0 12px 42px rgba(0,0,0,.54)}
-.subtitle{max-width:790px;margin:24px 0 0;font-size:clamp(18px,2.1vw,30px);line-height:1.34}.intro{max-width:720px;color:var(--muted);font-size:clamp(14px,1.35vw,18px);line-height:1.58;margin:18px 0 0}
-.quick-nav{display:grid;gap:10px;width:min(330px,100%)}.quick-nav a,.button{border:1px solid var(--line);background:var(--panel);text-transform:uppercase;letter-spacing:.10em;transition:background .16s ease,border-color .16s ease,transform .16s ease}
-.quick-nav a{padding:16px 18px}.quick-nav a:hover,.button:hover,.quick-nav a:focus-visible,.button:focus-visible{background:var(--soft);border-color:var(--ink);transform:translateY(-2px);outline:none}
-.section{padding:clamp(32px,5vw,70px) clamp(22px,5vw,58px);border-bottom:1px solid var(--line)}.section-title{margin:0 0 26px;text-transform:uppercase;letter-spacing:.20em;color:var(--muted);font-size:13px}
-.apps{display:grid;gap:26px}.app-card{display:grid;grid-template-columns:minmax(280px,.96fr) minmax(300px,1.04fr);border:1px solid var(--line);background:rgba(0,0,0,.12);overflow:hidden}
-.shot{min-height:310px;background:linear-gradient(140deg,rgba(245,242,232,.08),rgba(0,0,0,.12)),radial-gradient(circle at 50% 40%,rgba(245,242,232,.12),transparent 38%);border-right:1px solid var(--line);display:grid;place-items:center;position:relative}.shot img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.96) contrast(1.04)}
-.fallback{padding:30px;text-align:center;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;line-height:1.5}.app-body{padding:clamp(24px,4vw,42px);display:grid;align-content:center;gap:18px}.app-number{color:var(--muted);text-transform:uppercase;letter-spacing:.22em;font-size:12px}
-.app-body h2{margin:0;font-size:clamp(28px,4vw,56px);line-height:.95;text-transform:uppercase;letter-spacing:-.035em}.app-body p,.instruction-panel p,.instruction-panel li{margin:0;color:var(--muted);font-size:clamp(14px,1.28vw,18px);line-height:1.55}
-.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}.button{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 18px;font-size:12px}.button.primary{background:var(--ink);color:#10140f;border-color:var(--ink)}.button.primary:hover{background:transparent;color:var(--ink)}
+.subtitle{max-width:860px;margin:24px 0 0;font-size:clamp(18px,2.1vw,30px);line-height:1.34}.intro{max-width:760px;color:var(--muted);font-size:clamp(14px,1.35vw,18px);line-height:1.58;margin:18px 0 0}
+.quick-nav{display:grid;gap:10px;width:100%}.quick-nav a,.button{border:1px solid var(--line);background:var(--panel);text-transform:uppercase;letter-spacing:.10em;transition:background .16s ease,border-color .16s ease,transform .16s ease}
+.quick-nav a{padding:14px 16px}.quick-nav a:hover,.button:hover,.quick-nav a:focus-visible,.button:focus-visible{background:var(--soft);border-color:var(--ink);transform:translateY(-2px);outline:none}
+.section{padding:clamp(28px,4vw,56px) clamp(22px,5vw,58px);border-bottom:1px solid var(--line)}.section-title{margin:0 0 18px;text-transform:uppercase;letter-spacing:.20em;color:var(--muted);font-size:13px}
+.apps{display:grid;gap:12px}.app-card{display:grid;grid-template-columns:112px 1fr auto;gap:18px;align-items:center;border:1px solid var(--line);background:rgba(0,0,0,.12);padding:18px}
+.app-number{color:var(--muted);text-transform:uppercase;letter-spacing:.22em;font-size:12px}.app-body{min-width:0}.app-body h2{margin:0 0 8px;font-size:clamp(28px,3.3vw,48px);line-height:.95;text-transform:uppercase;letter-spacing:-.035em}.app-body p,.instruction-panel p,.instruction-panel li{margin:0;color:var(--muted);font-size:clamp(14px,1.18vw,17px);line-height:1.52}
+.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}.button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;font-size:12px}.button.primary{background:var(--ink);color:#10140f;border-color:var(--ink)}.button.primary:hover{background:transparent;color:var(--ink)}
 .instructions{display:grid;grid-template-columns:.9fr 1.1fr;gap:28px}.instruction-panel{border:1px solid var(--line);padding:clamp(22px,3vw,34px);background:rgba(0,0,0,.12)}.instruction-panel h2{margin:0 0 16px;text-transform:uppercase;letter-spacing:.08em;font-size:clamp(20px,2vw,28px)}ol{margin:0;padding-left:22px}li+li{margin-top:10px}code{color:#d9e1c4;background:rgba(0,0,0,.26);padding:.12em .35em;border:1px solid rgba(245,242,232,.14)}
 .file-tree{border:1px solid var(--line);padding:22px;background:rgba(0,0,0,.18);overflow-x:auto;color:var(--muted);line-height:1.55;font-size:14px}footer{padding:24px;text-align:center;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);font-size:12px}
-@media(max-width:880px){.page{width:min(100vw - 16px,720px);margin:8px auto}header,.hero{grid-template-columns:1fr}header{align-items:flex-start;flex-direction:column;padding:16px}.hero{padding:34px 20px}.quick-nav{width:100%}.app-card,.instructions{grid-template-columns:1fr}.shot{border-right:0;border-bottom:1px solid var(--line);min-height:230px}.section{padding:30px 16px}}
+@media(max-width:880px){.page{width:min(100vw - 16px,720px);margin:8px auto}header,.hero{grid-template-columns:1fr}header{align-items:flex-start;flex-direction:column;padding:16px}.hero{padding:34px 20px}.quick-nav{width:100%}.app-card{grid-template-columns:1fr;gap:12px}.actions{justify-content:flex-start}.instructions{grid-template-columns:1fr}.section{padding:30px 16px}}
 </style>
 </head>
 <body>
   <main class="page">
     <header>
       <div class="brand"><span class="mark" aria-hidden="true">≋</span><span>Browser-based HTML apps</span></div>
-      <div class="meta"><span>v1.0.0</span><span>2026-06-16</span></div>
+      <div class="meta"><span>v1.1.0</span><span>2026-06-22</span></div>
     </header>
 
     <section class="hero">
       <div>
         <h1>Sonification<br>Suite</h1>
-        <p class="subtitle">Maps become melodies. Stars become phrases. The sea becomes a waveform.</p>
-        <p class="intro">A collection of browser-based instruments for transforming geography, astronomy and environmental data into sound. Open an app, explore the interface, export the result, or download the standalone HTML file.</p>
+        <p class="subtitle">Maps become melodies. Stars become phrases. Motion becomes sound. The sea becomes a waveform.</p>
+        <p class="intro">A compact collection of browser-based instruments for transforming geography, astronomy, movement and environmental data into sound. Open an app, explore the interface, export the result, or download the standalone HTML file.</p>
       </div>
       <nav class="quick-nav" aria-label="Select an app">
         <a href="#map-to-midi">01 Map → MIDI</a>
         <a href="#sky-to-midi">02 Sky → MIDI</a>
-        <a href="#your-daily-wavetable">03 Your Daily Wavetable</a>
+        <a href="#motion-to-midi">03 Motion → MIDI</a>
+        <a href="#your-daily-wavetable">04 Your Daily Wavetable</a>
       </nav>
     </section>
 
@@ -58,33 +57,39 @@ h1{margin:0;font-family:Impact,"Arial Narrow","Helvetica Neue Condensed Bold",sa
       <h2 class="section-title">Apps</h2>
       <div class="apps">
         <article class="app-card" id="map-to-midi">
-          <div class="shot"><img src="./assets/screenshots/map-to-midi.png" alt="Screenshot of the Map to MIDI browser app showing a route interface, map trace controls and sound export parameters." onerror="this.remove(); this.parentElement.insertAdjacentHTML('beforeend','<div class=&quot;fallback&quot;>Add screenshot:<br>assets/screenshots/map-to-midi.png</div>')" /></div>
+          <span class="app-number">01 / Cartographic sonification</span>
           <div class="app-body">
-            <span class="app-number">01 / Cartographic sonification</span>
             <h2>Map → MIDI</h2>
             <p>Upload a GPX, GeoJSON, KML or drawn route and transform its shape, motion and elevation into MIDI phrases, harmonies and exportable audio.</p>
-            <div class="actions"><a class="button primary" href="./map-to-midi/">Open app</a><a class="button" href="./map-to-midi/index.html" download>Download HTML</a></div>
           </div>
+          <div class="actions"><a class="button primary" href="./map-to-midi/">Open app</a><a class="button" href="./map-to-midi/index.html" download>Download HTML</a></div>
         </article>
 
         <article class="app-card" id="sky-to-midi">
-          <div class="shot"><img src="./assets/screenshots/sky-to-midi.png" alt="Screenshot of the Sky to MIDI browser app with a star field, constellation drawing interface, celestial sound controls and MIDI export options." onerror="this.remove(); this.parentElement.insertAdjacentHTML('beforeend','<div class=&quot;fallback&quot;>Add screenshot:<br>assets/screenshots/sky-to-midi.png</div>')" /></div>
+          <span class="app-number">02 / Celestial sonification</span>
           <div class="app-body">
-            <span class="app-number">02 / Celestial sonification</span>
             <h2>Sky → MIDI</h2>
             <p>Select constellations, connect stars and convert drawn sky paths into musical phrases. Star positions, density and brightness become rhythm, panning and melodic movement.</p>
-            <div class="actions"><a class="button primary" href="./sky-to-midi/">Open app</a><a class="button" href="./sky-to-midi/index.html" download>Download HTML</a></div>
           </div>
+          <div class="actions"><a class="button primary" href="./sky-to-midi/">Open app</a><a class="button" href="./sky-to-midi/index.html" download>Download HTML</a></div>
+        </article>
+
+        <article class="app-card" id="motion-to-midi">
+          <span class="app-number">03 / Motion sonification</span>
+          <div class="app-body">
+            <h2>Motion → MIDI</h2>
+            <p>Use a webcam or uploaded video to trace movement, blobs and lines, then turn motion into direct synthesized sound, MIDI events, audio exports and video renders.</p>
+          </div>
+          <div class="actions"><a class="button primary" href="./motion-to-midi/">Open app</a><a class="button" href="./motion-to-midi/index.html" download>Download HTML</a></div>
         </article>
 
         <article class="app-card" id="your-daily-wavetable">
-          <div class="shot"><img src="./assets/screenshots/your-daily-wavetable.png" alt="Screenshot of Your Daily Wavetable, a hydroacoustic synthesis app showing sea-state data, wavetable curves, sliders and WAV export controls." onerror="this.remove(); this.parentElement.insertAdjacentHTML('beforeend','<div class=&quot;fallback&quot;>Add screenshot:<br>assets/screenshots/your-daily-wavetable.png</div>')" /></div>
+          <span class="app-number">04 / Hydroacoustic synthesis</span>
           <div class="app-body">
-            <span class="app-number">03 / Hydroacoustic synthesis</span>
             <h2>Your Daily Wavetable</h2>
             <p>Generate a playable wavetable from sea-state and maritime values. Wave height, swell, current and period become harmonic body, motion and waveform evolution.</p>
-            <div class="actions"><a class="button primary" href="./your-daily-wavetable/">Open app</a><a class="button" href="./your-daily-wavetable/index.html" download>Download HTML</a></div>
           </div>
+          <div class="actions"><a class="button primary" href="./your-daily-wavetable/">Open app</a><a class="button" href="./your-daily-wavetable/index.html" download>Download HTML</a></div>
         </article>
       </div>
     </section>
@@ -95,7 +100,7 @@ h1{margin:0;font-family:Impact,"Arial Narrow","Helvetica Neue Condensed Bold",sa
         <div class="instruction-panel">
           <h2>For visitors</h2>
           <ol>
-            <li>Choose one of the three apps above.</li>
+            <li>Choose one of the four apps above.</li>
             <li>Click <strong>Open app</strong> to use it directly in the browser.</li>
             <li>Click <strong>Download HTML</strong> to save the standalone app file.</li>
             <li>Open the downloaded <code>index.html</code> locally, or place it in another static website folder.</li>
@@ -106,14 +111,11 @@ h1{margin:0;font-family:Impact,"Arial Narrow","Helvetica Neue Condensed Bold",sa
           <p>Each app lives in its own folder. The download buttons point directly to each app’s standalone HTML file.</p>
           <pre class="file-tree">sonification/
 ├─ index.html
-├─ assets/
-│  └─ screenshots/
-│     ├─ map-to-midi.png
-│     ├─ sky-to-midi.png
-│     └─ your-daily-wavetable.png
 ├─ map-to-midi/
 │  └─ index.html
 ├─ sky-to-midi/
+│  └─ index.html
+├─ motion-to-midi/
 │  └─ index.html
 └─ your-daily-wavetable/
    └─ index.html</pre>
