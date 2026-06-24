@@ -60,6 +60,12 @@
   .setup .cell.grow{ flex:1 1 auto; }
   .setup label{ font-size:8.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-faint); }
   .setup .ln{ display:flex; gap:8px; align-items:center; }
+  .setup .lfo-cell{ flex:0 0 306px; }
+  .setup .lfo-line{ align-items:center; }
+  .setup .lfo-mini{ display:grid; grid-template-columns:44px 1fr 62px; gap:7px; align-items:center; }
+  .setup .lfo-mini span{ font-size:9px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.08em; }
+  .setup .lfo-mini .val{ text-align:right; color:var(--ink); font-size:10px; letter-spacing:0; text-transform:none; }
+  .setup .lfo-mini input[type=range]{ min-width:86px; }
 
   input[type=text]{ width:100%; min-width:90px; background:var(--ink-well); color:var(--ink); border:1px solid var(--rule); border-radius:0; font-size:12px; padding:6px 8px; }
   input[type=text]:focus{ outline:none; border-color:var(--ink); }
@@ -100,13 +106,17 @@
   .item .box{ width:12px; height:12px; border:1px solid var(--ink-faint); flex:0 0 auto; position:relative; background:var(--ink-well); }
   .item.on{ color:var(--ink); } .item.on .box{ border-color:var(--ink); } .item.on .box::after{ content:""; position:absolute; inset:2px; background:var(--ink); }
   .item .nm{ flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .uitem .box{ width:12px; height:12px; border:1px solid var(--ink-faint); flex:0 0 auto; position:relative; background:var(--ink-well); cursor:pointer; }
+  .uitem.on .box{ border-color:var(--ink); }
+  .uitem.on .box::after{ content:""; position:absolute; inset:2px; background:var(--ink); }
+  .uitem.off{ opacity:.62; }
+  .uitem.off .uname{ color:var(--ink-faint); }
   .item .ct{ font-size:9px; color:var(--ink-faint); }
   .empty{ font-size:10px; color:var(--ink-faint); padding:4px 0; line-height:1.5; }
 
   /* user-line items: renamable name + mode select + remove */
   .uitem{ border-bottom:1px dotted var(--rule-soft); padding:7px 2px; }
   .uitem-top{ display:flex; align-items:center; gap:8px; }
-  .uitem .swatch{ width:12px; height:12px; border:1px solid var(--ink); background:var(--ink); flex:0 0 auto; }
   .uname{ flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:text; color:var(--ink); font-size:11px; border-bottom:1px dotted transparent; }
   .uname:hover{ border-bottom-color:var(--ink-faint); }
   .rename{ flex:1 1 auto; min-width:0; background:var(--ink-well); border:1px solid var(--ink); font-size:11px; padding:1px 4px; color:var(--ink); }
@@ -129,6 +139,10 @@
   .zoombar .zr{ font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-faint); cursor:pointer; border-left:1px solid var(--rule); padding-left:9px; }
   .zoombar .zr:hover{ color:var(--ink); }
 
+  .skycap{ position:absolute; left:18px; bottom:18px; z-index:4; padding:8px 12px; box-shadow:0 8px 20px rgba(0,0,0,.05); }
+  .timeSigInput{ width:100%; min-width:0; background:var(--ink-well); color:var(--ink); border:1px solid var(--rule); border-radius:0; font-size:12px; padding:6px 8px; }
+  .timeSigInput:focus{ outline:none; border-color:var(--ink); }
+
   /* ── Deck (bottom-right): tonality · transport · readout ──────────────────── */
   .deck{ grid-column:2; grid-row:2; display:grid; grid-template-columns:0.92fr 1.32fr 0.92fr; border-top:1px solid var(--rule); min-height:0; }
   .deck > section{ border-right:1px solid var(--rule); padding:10px 14px; min-width:0; overflow-y:auto; }
@@ -147,6 +161,9 @@
   .transport-btns button:last-child{ border-right:none; }
   .transport-btns button:hover:not(:disabled){ background:var(--paper-2); }
   .transport-btns button:disabled{ color:var(--ink-faint); cursor:not-allowed; }
+  #playBtn{ background:var(--ink); color:var(--paper); font-weight:600; }
+  #playBtn:hover:not(:disabled){ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  #playBtn:disabled{ background:var(--ink); color:var(--paper); opacity:.55; }
   .transport-btns button.playing{ background:var(--ink); color:var(--paper); font-weight:600; }
   .transport-btns button.playing::after{ content:"..."; display:inline-block; width:1.8em; overflow:hidden; text-align:left; vertical-align:bottom; animation:playDots 1.05s steps(4,end) infinite; }
   @keyframes playDots{ 0%{width:0;} 100%{width:1.8em;} }
@@ -172,12 +189,15 @@
   .cardinal{ fill:var(--ink-soft); font-size:13px; letter-spacing:0.1em; font-family:var(--f-mono); }
   .cardinal.minor{ fill:var(--ink-faint); font-size:10px; }
   .star{ fill:var(--ink); } .star.dim{ fill:var(--ink-faint); }
+  .centerx{ stroke:var(--ink-faint); stroke-width:1.4; stroke-linecap:square; pointer-events:none; }
   .starhit{ fill:transparent; cursor:crosshair; }
   .starlbl{ fill:var(--ink-soft); font-size:9.5px; font-family:var(--f-mono); letter-spacing:0.04em; }
   .figline{ stroke:var(--ink-faint); stroke-width:0.8; stroke-dasharray:1.5 3; fill:none; }
   .figline.active{ stroke:var(--ink); stroke-width:1.5; stroke-dasharray:none; }
   .userline{ stroke:var(--ink); stroke-width:1.5; fill:none; }
+  .userline.inactive{ stroke:var(--ink-faint); stroke-dasharray:3 4; opacity:.58; }
   .usernode{ fill:var(--ink-well); stroke:var(--ink); stroke-width:1.2; }
+  .usernode.inactive{ stroke:var(--ink-faint); opacity:.58; }
   .rubber{ stroke:var(--ink); stroke-width:1; stroke-dasharray:3 3; fill:none; opacity:.6; }
   .anchor{ fill:none; stroke:var(--ink); stroke-width:1.4; }
   .conlabel{ fill:var(--ink-soft); font-size:10px; letter-spacing:0.14em; text-transform:uppercase; font-family:var(--f-mono); }
@@ -221,6 +241,23 @@
           <button class="tbtn" id="nowBtn">Now</button>
         </div>
       </div>
+      <div class="cell lfo-cell">
+        <label>Time LFO / export automation</label>
+        <div class="ln lfo-line">
+          <select id="timeLfoWave" class="sm">
+            <option value="off" selected>Off</option>
+            <option value="sine">Sine</option>
+            <option value="triangle">Triangle</option>
+            <option value="saw">Saw</option>
+            <option value="reverse saw">Reverse saw</option>
+            <option value="square">Square</option>
+            <option value="binary">Binary</option>
+            <option value="random">Random</option>
+          </select>
+        </div>
+        <div class="lfo-mini"><span>Rate</span><input type="range" id="timeLfoRate" min="0.05" max="20" step="0.05" value="0.50" /><span class="val" id="timeLfoRateVal">0.50/min</span></div>
+        <div class="lfo-mini"><span>Range</span><input type="range" id="timeLfoRange" min="0" max="24" step="1" value="24" /><span class="val" id="timeLfoRangeVal">±12.0h</span></div>
+      </div>
     </div>
   </header>
 
@@ -253,6 +290,7 @@
         <div class="t">No sky rendered</div>
         <div class="s">Enter a location or use “Locate me” to chart tonight's stars.</div>
       </div>
+      <button class="tbtn skycap" id="skyCaptureBtn">Sky capture</button>
       <div class="zoombar">
         <label>Zoom</label>
         <input type="range" id="zoom" min="100" max="600" step="10" value="100" />
@@ -268,6 +306,7 @@
         <div class="row"><label>Key</label><select id="key"></select></div>
         <div class="row"><label>Scale</label><select id="scale"></select></div>
         <div class="row"><label>Register</label><select id="register"><option value="low">Low</option><option value="mid" selected>Middle</option><option value="high">High</option></select></div>
+        <div class="row"><label>Time signature</label><input type="text" id="timeSignature" class="timeSigInput" value="4/4" placeholder="4/4" spellcheck="false" /></div>
       </section>
 
       <section>
@@ -283,13 +322,15 @@
         <div class="export">
           <button class="tbtn full" id="exportToggle">Export MIDI ▸</button>
           <div class="export-panel" id="exportPanel">
+            <div class="row"><label>Type</label><select id="midiMode"><option value="full" selected>Full MIDI · one track</option><option value="stems">Stems · one file per constellation</option></select></div>
             <div class="row"><label>Duration</label><div class="range-row"><input type="range" id="midiDur" min="10" max="300" step="5" value="60"><span class="val" id="midiDurVal">60 s</span></div></div>
-            <button class="tbtn full solid dl" id="downloadMidi">Download .mid</button>
+            <button class="tbtn full solid dl" id="downloadMidi">Download full MIDI</button>
           </div>
           <button class="tbtn full" id="audioExportToggle">Export audio ▸</button>
           <div class="export-panel" id="audioExportPanel">
+            <div class="row"><label>Type</label><select id="audioMode"><option value="mix" selected>Full audio</option><option value="stems">Stems · one file per constellation</option></select></div>
             <div class="row"><label>Duration</label><div class="range-row"><input type="range" id="audioDur" min="10" max="300" step="5" value="60"><span class="val" id="audioDurVal">60 s</span></div></div>
-            <button class="tbtn full solid dl" id="downloadAudio">Download audio</button>
+            <button class="tbtn full solid dl" id="downloadAudio">Download full audio</button>
           </div>
         </div>
       </section>
@@ -397,6 +438,27 @@ const FIGURES = {
   CEN:{ name:'Centaurus',   palette:'bass',    poly:[['rigilKent','hadar']] },
 };
 
+
+const CONSTELLATION_INFO = {
+  ORI:{abbr:'Ori', meaning:'the hunter', archiveAge:'ancient / Ptolemaic tradition', seasonal:'prominent in northern winter', note:'A bright equatorial figure organised around Orion\'s Belt and frequently used as a visual anchor in star charts.', stars:['Betelgeuse','Bellatrix','Mintaka','Alnilam','Alnitak','Rigel','Saiph']},
+  UMA:{abbr:'UMa', meaning:'the great bear', archiveAge:'ancient / Ptolemaic tradition', seasonal:'circumpolar in much of the northern hemisphere', note:'Contains the Big Dipper asterism, a major orientation tool in northern skies.', stars:['Dubhe','Merak','Phecda','Megrez','Alioth','Mizar','Alkaid']},
+  CAS:{abbr:'Cas', meaning:'the queen', archiveAge:'ancient / Ptolemaic tradition', seasonal:'often circumpolar in the north', note:'Recognisable W-shaped figure opposite Ursa Major across Polaris.', stars:['Caph','Schedar','Gamma Cassiopeiae','Ruchbah','Segin']},
+  CYG:{abbr:'Cyg', meaning:'the swan', archiveAge:'ancient / Ptolemaic tradition', seasonal:'northern summer and autumn', note:'Also read as the Northern Cross, with Deneb marking one point of the Summer Triangle.', stars:['Deneb','Sadr','Albireo','Gienah','Delta Cygni']},
+  LYR:{abbr:'Lyr', meaning:'the lyre', archiveAge:'ancient / Ptolemaic tradition', seasonal:'northern summer', note:'A compact musical constellation centred on Vega, one of the brightest stars in the sky.', stars:['Vega','Zeta Lyrae','Sheliak','Sulafat','Delta Lyrae']},
+  AQL:{abbr:'Aql', meaning:'the eagle', archiveAge:'ancient / Ptolemaic tradition', seasonal:'northern summer', note:'Altair and its flanking stars form a narrow body line associated with swift motion.', stars:['Tarazed','Altair','Alshain']},
+  LEO:{abbr:'Leo', meaning:'the lion', archiveAge:'ancient / Ptolemaic tradition', seasonal:'northern spring', note:'A zodiac constellation whose sickle-shaped front section curves out from Regulus.', stars:['Regulus','Eta Leonis','Algieba','Epsilon Leonis','Chertan','Denebola','Zosma']},
+  SCO:{abbr:'Sco', meaning:'the scorpion', archiveAge:'ancient / Ptolemaic tradition', seasonal:'southern summer in the north / winter in the south', note:'A long southern zodiac figure structured around Antares and a curling tail.', stars:['Graffias','Dschubba','Antares','Tau Scorpii','Epsilon Scorpii','Sargas','Shaula','Lesath']},
+  TAU:{abbr:'Tau', meaning:'the bull', archiveAge:'ancient / Ptolemaic tradition', seasonal:'northern winter', note:'A zodiac constellation with Aldebaran in the Hyades region and horn lines extending toward Elnath.', stars:['Elnath','Aldebaran','Zeta Tauri']},
+  GEM:{abbr:'Gem', meaning:'the twins', archiveAge:'ancient / Ptolemaic tradition', seasonal:'northern winter', note:'A zodiac pair led by Castor and Pollux, often read as parallel bodies descending across the sky.', stars:['Castor','Pollux','Mebsuta','Alhena','Wasat','Tejat']},
+  CMA:{abbr:'CMa', meaning:'the greater dog', archiveAge:'ancient / Ptolemaic tradition', seasonal:'northern winter', note:'Home to Sirius, the brightest star in the night sky, with a descending southern line.', stars:['Mirzam','Sirius','Wezen','Adhara','Aludra']},
+  CMI:{abbr:'CMi', meaning:'the lesser dog', archiveAge:'ancient / Ptolemaic tradition', seasonal:'northern winter', note:'A minimal two-star figure anchored by Procyon and Gomeisa.', stars:['Procyon','Gomeisa']},
+  BOO:{abbr:'Boo', meaning:'the herdsman', archiveAge:'ancient / Ptolemaic tradition', seasonal:'northern spring', note:'Arcturus dominates the figure, which opens into a kite-like geometry.', stars:['Arcturus','Izar','Nekkar','Gamma Boötis','Muphrid']},
+  AUR:{abbr:'Aur', meaning:'the charioteer', archiveAge:'ancient / Ptolemaic tradition', seasonal:'northern winter', note:'A broad pentagonal figure centred on Capella and often overlapping visually with Taurus.', stars:['Capella','Menkalinan','Theta Aurigae','Elnath','Iota Aurigae']},
+  PEG:{abbr:'Peg', meaning:'the winged horse', archiveAge:'ancient / classical tradition', seasonal:'northern autumn', note:'Built from the Great Square and extensions toward Enif, a large-scale marker of autumn skies.', stars:['Markab','Scheat','Alpheratz','Algenib','Enif']},
+  CRU:{abbr:'Cru', meaning:'the southern cross', archiveAge:'early-modern southern constellation', seasonal:'southern hemisphere icon', note:'A small but highly recognisable southern cross used for orientation and navigation.', stars:['Acrux','Gacrux','Mimosa','Delta Crucis']},
+  CEN:{abbr:'Cen', meaning:'the centaur', archiveAge:'ancient / Ptolemaic with major southern extension', seasonal:'southern skies', note:'A sprawling southern constellation whose brightest stars include Alpha and Beta Centauri.', stars:['Rigil Kentaurus','Hadar']}
+};
+
 const CITIES = {
   'porto':[41.15,-8.61],'lisbon':[38.72,-9.13],'madrid':[40.42,-3.70],'barcelona':[41.39,2.17],'paris':[48.86,2.35],
   'london':[51.51,-0.13],'dublin':[53.35,-6.26],'amsterdam':[52.37,4.90],'berlin':[52.52,13.40],'rome':[41.90,12.50],
@@ -454,6 +516,7 @@ function dateForLocalHour(lon, hourFloat){
 ════════════════════════════════════════════════════════════════════════════ */
 const state = {
   lat:41.15, lon:-8.61, locLabel:'Porto', date:new Date(), useNow:true,
+  timeLfoStartedAt:0, timeLfoBaseStep:null,
   sky:null, rendered:false,
   active:new Set(), drawings:[], drawing:null,
   isPlaying:false, drawSeq:0, userPalIdx:0, didAutoActivate:false,
@@ -464,6 +527,7 @@ const voices = new Map();
 const $ = id => document.getElementById(id);
 const els = {
   locInput:$('locInput'), locFind:$('locFind'), hour:$('hour'), nowBtn:$('nowBtn'),
+  timeLfoWave:$('timeLfoWave'), timeLfoRate:$('timeLfoRate'), timeLfoRateVal:$('timeLfoRateVal'), timeLfoRange:$('timeLfoRange'), timeLfoRangeVal:$('timeLfoRangeVal'),
   endLine:$('endLine'), undoPt:$('undoPt'),
   conList:$('conList'), conCount:$('conCount'), userList:$('userList'), userCount:$('userCount'),
   sky:$('sky'), svg:$('skySvg'), skyMsg:$('skyMsg'),
@@ -471,8 +535,9 @@ const els = {
   key:$('key'), scale:$('scale'), register:$('register'),
   playBtn:$('playBtn'), stopBtn:$('stopBtn'), clearBtn:$('clearBtn'),
   tempo:$('tempo'), tempoVal:$('tempoVal'), density:$('density'), densityVal:$('densityVal'), volume:$('volume'), volumeVal:$('volumeVal'),
-  exportToggle:$('exportToggle'), exportPanel:$('exportPanel'), midiDur:$('midiDur'), midiDurVal:$('midiDurVal'), downloadMidi:$('downloadMidi'),
-  audioExportToggle:$('audioExportToggle'), audioExportPanel:$('audioExportPanel'), audioDur:$('audioDur'), audioDurVal:$('audioDurVal'), downloadAudio:$('downloadAudio'),
+  exportToggle:$('exportToggle'), exportPanel:$('exportPanel'), midiMode:$('midiMode'), midiDur:$('midiDur'), midiDurVal:$('midiDurVal'), downloadMidi:$('downloadMidi'),
+  audioExportToggle:$('audioExportToggle'), audioExportPanel:$('audioExportPanel'), audioMode:$('audioMode'), audioDur:$('audioDur'), audioDurVal:$('audioDurVal'), downloadAudio:$('downloadAudio'),
+  timeSignature:$('timeSignature'), skyCaptureBtn:$('skyCaptureBtn'),
   rLoc:$('rLoc'), rTime:$('rTime'), rLst:$('rLst'), rStars:$('rStars'), rCons:$('rCons'), rVoices:$('rVoices'),
   logbar:$('logbar'),
 };
@@ -491,18 +556,23 @@ function magRadius(mag){ return clamp(3.7-(mag+1.5)*0.55,0.7,3.7); }
 /* ════════════════════════════════════════════════════════════════════════════
    SKY COMPUTE + RENDER
 ════════════════════════════════════════════════════════════════════════════ */
-function computeSky(){
-  const date = state.useNow ? new Date() : state.date;
-  const lstD = lstDeg(date, state.lon);
+function computeSkyForDate(date, lat, lon){
+  lat = lat==null ? state.lat : lat;
+  lon = lon==null ? state.lon : lon;
+  const lstD = lstDeg(date, lon);
   const stars=[], byId={};
   for(const id in STARS){
     const [ra,dec,mag,name]=STARS[id];
-    const h=eqToHoriz(ra,dec,state.lat,lstD);
+    const h=eqToHoriz(ra,dec,lat,lstD);
     const o={ id, alt:h.alt, az:h.az, mag, name:name||null };
     if(h.alt>=0){ const p=project(h.alt,h.az); o.x=p.x; o.y=p.y; stars.push(o); }
     byId[id]=o;
   }
-  state.sky={ stars, byId, lstD, date };
+  return { stars, byId, lstD, date };
+}
+function computeSky(){
+  const date = state.useNow ? new Date() : state.date;
+  state.sky=computeSkyForDate(date, state.lat, state.lon);
   state.rendered=true;
 }
 function figureVisible(abbr){ const by=state.sky.byId, seen=new Set(); let up=0;
@@ -528,7 +598,10 @@ function renderSky(){
   svg.appendChild(svgEl('circle',{cx,cy,r:R,class:'horizon'}));
   [30,60].forEach(a=>{ const rr=((90-a)/90)*R; svg.appendChild(svgEl('circle',{cx,cy,r:rr,class:'altring'})); });
   for(let k=0;k<12;k++){ const a=rad(k*30); svg.appendChild(svgEl('line',{x1:cx,y1:cy,x2:cx-R*Math.sin(a),y2:cy-R*Math.cos(a),class:'merid'})); }
-  svg.appendChild(svgEl('circle',{cx,cy,r:1.6,class:'star'}));
+  const mid=svgEl('g',{'aria-hidden':'true','pointer-events':'none'});
+  mid.appendChild(svgEl('line',{x1:cx-4.5,y1:cy-4.5,x2:cx+4.5,y2:cy+4.5,class:'centerx'}));
+  mid.appendChild(svgEl('line',{x1:cx+4.5,y1:cy-4.5,x2:cx-4.5,y2:cy+4.5,class:'centerx'}));
+  svg.appendChild(mid);
   const card=(t,x,y,minor)=>{ const e=svgEl('text',{x,y,'text-anchor':'middle','dominant-baseline':'middle',class:'cardinal'+(minor?' minor':'')}); e.textContent=t; svg.appendChild(e); };
   card('N',cx,cy-R-14); card('S',cx,cy+R+16); card('E',cx-R-14,cy); card('W',cx+R+14,cy);
   card('NE',cx-R*0.72,cy-R*0.72,true); card('NW',cx+R*0.72,cy-R*0.72,true); card('SE',cx-R*0.72,cy+R*0.72,true); card('SW',cx+R*0.72,cy+R*0.72,true);
@@ -545,10 +618,11 @@ function renderSky(){
 
   const userG=svgEl('g',{}); svg.appendChild(userG);
   state.drawings.forEach(dr=>{
+    const inactive = dr.active===false;
     const pts=dr.starIds.map(s=>state.sky.byId[s]).filter(p=>p&&p.alt>=0);
-    if(pts.length>=2){ const pathPts=(dr.closed&&pts.length>2)?pts.concat([pts[0]]):pts; const d='M'+pathPts.map(p=>p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' L'); userG.appendChild(svgEl('path',{d,class:'userline'})); }
-    pts.forEach(p=>userG.appendChild(svgEl('rect',{x:p.x-2.6,y:p.y-2.6,width:5.2,height:5.2,class:'usernode'})));
-    if(pts.length){ let sx=0,sy=0; pts.forEach(p=>{ sx+=p.x; sy+=p.y; }); const lab=svgEl('text',{x:sx/pts.length,y:sy/pts.length-8,'text-anchor':'middle',class:'conlabel'}); lab.textContent=displayName(dr); userG.appendChild(lab); }
+    if(pts.length>=2){ const pathPts=(dr.closed&&pts.length>2)?pts.concat([pts[0]]):pts; const d='M'+pathPts.map(p=>p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' L'); userG.appendChild(svgEl('path',{d,class:'userline'+(inactive?' inactive':'')})); }
+    pts.forEach(p=>userG.appendChild(svgEl('rect',{x:p.x-2.6,y:p.y-2.6,width:5.2,height:5.2,class:'usernode'+(inactive?' inactive':'')})));
+    if(pts.length){ let sx=0,sy=0; pts.forEach(p=>{ sx+=p.x; sy+=p.y; }); const lab=svgEl('text',{x:sx/pts.length,y:sy/pts.length-8,'text-anchor':'middle',class:'conlabel'}); lab.textContent=displayName(dr); if(inactive) lab.setAttribute('opacity','.58'); userG.appendChild(lab); }
   });
 
   const drawG=svgEl('g',{id:'drawG'}); svg.appendChild(drawG);
@@ -594,14 +668,18 @@ function renderRail(){
   els.userCount.textContent=state.drawings.length?('· '+state.drawings.length):'';
   if(!state.drawings.length){ els.userList.innerHTML='<div class="empty">Connect stars on the chart to compose a new phrase. Click a line\u2019s name to rename it.</div>'; }
   state.drawings.forEach(dr=>{
-    const item=document.createElement('div'); item.className='uitem';
+    if(dr.active == null) dr.active = true;
+    const item=document.createElement('div'); item.className='uitem '+(dr.active===false?'off':'on');
     const top=document.createElement('div'); top.className='uitem-top';
-    const sw=document.createElement('span'); sw.className='swatch';
+    const box=document.createElement('span'); box.className='box'; box.title=(dr.active===false?'Activate':'Deactivate')+' this line';
+    box.setAttribute('role','checkbox'); box.setAttribute('aria-checked', dr.active===false?'false':'true'); box.tabIndex=0;
+    box.addEventListener('click',e=>{ e.stopPropagation(); toggleDrawing(dr.id); });
+    box.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggleDrawing(dr.id); } });
     const nm=document.createElement('span'); nm.className='uname'; nm.title='Click to rename'; nm.textContent=displayName(dr)+' · '+paletteById(dr.paletteId).name;
     nm.addEventListener('click',()=>startRename(dr,nm));
     const x=document.createElement('span'); x.className='x'; x.title='Remove'; x.textContent='✕';
     x.addEventListener('click',e=>{ e.stopPropagation(); removeDrawing(dr.id); });
-    top.appendChild(sw); top.appendChild(nm); top.appendChild(x);
+    top.appendChild(box); top.appendChild(nm); top.appendChild(x);
     const sel=document.createElement('select'); sel.className='sm umode';
     Object.entries(MODES).forEach(([id,label])=>{ const o=document.createElement('option'); o.value=id; o.textContent=label; if(id===dr.mode) o.selected=true; sel.appendChild(o); });
     sel.addEventListener('change',()=>setDrawingMode(dr.id, sel.value));
@@ -613,7 +691,7 @@ function startRename(dr, span){
   const inp=document.createElement('input'); inp.type='text'; inp.className='rename'; inp.value=displayName(dr);
   span.replaceWith(inp); inp.focus(); inp.select();
   let done=false;
-  const commit=()=>{ if(done) return; done=true; const val=inp.value.trim(); dr.name=val||dr.name||('Line '+dr.label); renderRail(); renderSky(); updateReadout(); };
+  const commit=()=>{ if(done) return; done=true; const val=inp.value.trim(); dr.name=val||dr.name||('Line '+dr.label); const v=voices.get('usr:'+dr.id); if(v) v.label=displayName(dr); renderRail(); renderSky(); updateReadout(); };
   inp.addEventListener('keydown',e=>{ if(e.key==='Enter') inp.blur(); if(e.key==='Escape'){ inp.value=displayName(dr); inp.blur(); } });
   inp.addEventListener('blur',commit);
 }
@@ -627,8 +705,21 @@ function buildScalePitches(key, scale, lo, hi){
   out.sort((a,b)=>a-b);
   return out.length?out:[clamp(Math.round((lo+hi)/2),0,127)];
 }
-function registerShift(){ return els.register.value==='low'?-12 : els.register.value==='high'?12 : 0; }
-function loopStepsFor(k){ return k<=3?4 : k<=6?8 : k<=10?12 : 16; }
+function registerShiftValue(reg){ return reg==='low'?-12 : reg==='high'?12 : 0; }
+function registerShift(){ return registerShiftValue(els.register.value); }
+function eighthStepsPerBar(sig){
+  sig=sig || (typeof getTimeSignature==='function'?getTimeSignature():{num:4,den:4});
+  return Math.max(1, Math.round(sig.num * (8 / sig.den)));
+}
+function loopStepsFor(k, opts){
+  const base=k<=3?4 : k<=6?8 : k<=10?12 : 16;
+  const sigText=opts&&opts.timeSignature?opts.timeSignature:null;
+  const sig=sigText?parseTimeSignature(sigText):(typeof getTimeSignature==='function'?getTimeSignature():{num:4,den:4});
+  if(sig.num===4 && sig.den===4) return base;
+  const barSteps=eighthStepsPerBar(sig);
+  const bars=Math.max(1, Math.round(base/8));
+  return Math.max(1, barSteps * bars);
+}
 function durBeats(tok){ return ({'8n':0.5,'4n':1,'2n':2,'1n':4})[tok]||0.5; }
 function hashIds(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=(h*16777619)>>>0; } return (h%2147483647)||1; }
 function dedupeSteps(notes, ls){ const used=new Set(); notes.forEach(n=>{ n.step=((n.step%ls)+ls)%ls; while(used.has(n.step)) n.step=(n.step+1)%ls; used.add(n.step); }); notes.sort((a,b)=>a.step-b.step); return notes; }
@@ -660,19 +751,24 @@ function applyMode(notes, loopSteps, mode, palette){
 }
 
 /* altitude → pitch (higher in sky = higher); magnitude → velocity */
-function phraseFromStars(starIds, palette, mode){
-  const by=state.sky.byId, verts=starIds.map(s=>by[s]).filter(p=>p&&p.alt>=0);
+function phraseFromStarsAtSky(starIds, palette, mode, sky, opts){
+  sky = sky || state.sky;
+  const by=sky&&sky.byId?sky.byId:{}, verts=starIds.map(s=>by[s]).filter(p=>p&&p.alt>=0);
   if(verts.length<1) return null;
-  const sh=registerShift();
-  const set=buildScalePitches(els.key.value, els.scale.value, clamp(palette.lo+sh,24,103), clamp(palette.hi+sh,28,108));
+  opts=opts||{};
+  const key=opts.key || els.key.value, scale=opts.scale || els.scale.value, reg=opts.register || els.register.value;
+  const sh=registerShiftValue(reg);
+  const set=buildScalePitches(key, scale, clamp(palette.lo+sh,24,103), clamp(palette.hi+sh,28,108));
   const L=set.length, k=verts.length;
+  const loopSteps=loopStepsFor(k, opts);
   let notes=verts.map((v,i)=>({
-    step:Math.min(loopStepsFor(k)-1, Math.round(i/k*loopStepsFor(k))),
+    step:Math.min(loopSteps-1, Math.round(i/k*loopSteps)),
     midi:set[clamp(Math.round(clamp(v.alt/90,0,1)*(L-1)),0,L-1)],
     vel:clamp(Math.round(112-(v.mag+1.5)*13),38,118), mag:v.mag, dur:palette.dur, starId:v.id,
   }));
-  return applyMode(notes, loopStepsFor(k), mode, palette);
+  return applyMode(notes, loopSteps, mode, palette);
 }
+function phraseFromStars(starIds, palette, mode){ return phraseFromStarsAtSky(starIds, palette, mode, state.sky); }
 
 function modePalette(palette, mode){
   const p=Object.assign({}, palette, { env:Object.assign({}, palette.env||{}) });
@@ -704,10 +800,12 @@ function makeSynth(palette){
 
 let master=null, reverb=null, limiter=null, loop=null, globalStep=0;
 function ensureAudioGraph(){ if(master) return; limiter=new Tone.Limiter(-2).toDestination(); reverb=new Tone.Reverb({decay:4.2,wet:0.32}).connect(limiter); master=new Tone.Gain(0.8).connect(reverb); }
-function panForStars(starIds){ const by=state.sky?state.sky.byId:{}; let s=0,n=0; starIds.forEach(id=>{ const v=by[id]; if(v&&v.alt>=0){ s+=Math.sin(rad(v.az)); n++; } }); return n?clamp(-(s/n),-0.85,0.85):0; }
+function panForStarsAtSky(starIds, sky){ const by=sky&&sky.byId?sky.byId:{}; let s=0,n=0; starIds.forEach(id=>{ const v=by[id]; if(v&&v.alt>=0){ s+=Math.sin(rad(v.az)); n++; } }); return n?clamp(-(s/n),-0.85,0.85):0; }
+function panForStars(starIds){ return panForStarsAtSky(starIds, state.sky); }
 
-function buildDubBassPhrase(starIds, phrase){
-  const root=KEYS.indexOf(els.key.value), seed=hashIds(starIds.join('|')+'|dub|'+els.key.value);
+function buildDubBassPhrase(starIds, phrase, keyName){
+  keyName = keyName || els.key.value;
+  const root=KEYS.indexOf(keyName), seed=hashIds(starIds.join('|')+'|dub|'+keyName);
   let x=seed||1; const rnd=()=>{ x=(x*1103515245+12345)&0x7fffffff; return x/0x7fffffff; };
   const loopSteps=Math.max(16, (phrase&&phrase.loopSteps?phrase.loopSteps:8)*2);
   const pulses=[]; let step=0;
@@ -830,12 +928,13 @@ function flashStars(ids){
   });
 }
 
-async function playPreview(){
+async function playPreview(opts){
+  opts=opts||{};
   if(voices.size===0){ log('Activate a constellation or draw a line first, then press Play.',true); return; }
-  try{ await Tone.start(); }catch(e){ log('Audio is blocked until you interact with the page — press Play again.',true); return; }
-  ensureAudioGraph(); Tone.Transport.bpm.value=parseInt(els.tempo.value,10); startClock(); Tone.Transport.start();
+  try{ await Tone.start(); }catch(e){ log(opts.auto?'Autoplay was blocked by the browser — press Play once to start the default glass-bell constellation.':'Audio is blocked until you interact with the page — press Play again.',true); return; }
+  ensureAudioGraph(); Tone.Transport.bpm.value=parseInt(els.tempo.value,10); try{ const ts=getTimeSignature(); Tone.Transport.timeSignature=[ts.num, ts.den]; }catch(e){} startClock(); Tone.Transport.start();
   state.isPlaying=true; setPlayingUI(true); rebalance();
-  log('Playing — '+voices.size+' palette'+(voices.size>1?'s':'')+' layering in '+els.key.value+' '+SCALES[els.scale.value].label.toLowerCase()+'.');
+  log((opts.auto?'Auto-playing':'Playing')+' — '+voices.size+' palette'+(voices.size>1?'s':'')+' layering in '+els.key.value+' '+SCALES[els.scale.value].label.toLowerCase()+'.');
 }
 function stopPreview(){
   try{ Tone.Transport.stop(); }catch(e){}
@@ -845,22 +944,234 @@ function stopPreview(){
 }
 function setPlayingUI(p){ els.playBtn.classList.toggle('playing',p); els.playBtn.textContent='Play'; els.stopBtn.disabled=!p; }
 
+/* ── Time-of-night LFO / export automation ──────────────────────────────── */
+function hourStepToLabel(step){
+  step=((Math.round(finiteOr(step,0))%48)+48)%48;
+  return fmtClock(((18*60)+(step*30))%1440);
+}
+function seededUnit(i){
+  let x=(Math.floor(i)||0)+0x6d2b79f5;
+  x=Math.imul(x^(x>>>15),x|1);
+  x^=x+Math.imul(x^(x>>>7),x|61);
+  return ((x^(x>>>14))>>>0)/4294967296;
+}
+function timeLfoSettings(){
+  const wave=els.timeLfoWave?els.timeLfoWave.value:'off';
+  const currentStep=((parseInt(els.hour.value,10)||0)%48+48)%48;
+  const baseStep=state.timeLfoBaseStep==null?currentStep:state.timeLfoBaseStep;
+  return {
+    enabled:wave!=='off', wave,
+    rate:clamp(finiteOr(els.timeLfoRate&&els.timeLfoRate.value,0.5),0,20),
+    range:clamp(finiteOr(els.timeLfoRange&&els.timeLfoRange.value,24),0,24),
+    baseStep:((Math.round(finiteOr(baseStep,currentStep))%48)+48)%48,
+    lat:state.lat, lon:state.lon,
+    key:els.key.value, scale:els.scale.value, register:els.register.value,
+    timeSignature:(typeof getTimeSignature==='function'?getTimeSignature().text:'4/4')
+  };
+}
+function randomHoldBipolar(cycleIndex){
+  // Sample-and-hold random: one literal random sky offset per LFO cycle.
+  // No interpolation, no easing, no sine-like glide.
+  return seededUnit(cycleIndex)*2-1;
+}
+function sliderBoundedStep(baseStep, swingSteps){
+  // The LFO moves the actual Time of night slider, so keep it inside 0..47
+  // instead of wrapping invisibly around the clock.
+  return clamp(Math.round(finiteOr(baseStep,0)+finiteOr(swingSteps,0)),0,47);
+}
+function timeLfoBipolarAt(seconds, cfg){
+  cfg=cfg||timeLfoSettings();
+  const rate=Math.max(0,finiteOr(cfg.rate,0));
+  if(rate<=0) return 0;
+  const cycle=seconds*rate/60, ph=((cycle%1)+1)%1;
+  switch(cfg.wave){
+    case 'sine': return Math.sin(ph*Math.PI*2);
+    case 'triangle': return 1 - 4*Math.abs(ph-0.5);
+    case 'saw': return ph*2-1;
+    case 'reverse saw': return 1-ph*2;
+    case 'square': return ph<0.5?-1:1;
+    case 'binary': return ph<0.5?-1:1;
+    case 'random': return randomHoldBipolar(Math.floor(cycle));
+    default: return 0;
+  }
+}
+function timeLfoStepAt(seconds, cfg){
+  cfg=cfg||timeLfoSettings();
+  const current=((parseInt(els.hour.value,10)||0)%48+48)%48;
+  if(!cfg.enabled) return current;
+  const depth=clamp(Math.round(finiteOr(cfg.range,24)),0,24);
+  const rate=Math.max(0.0001,finiteOr(cfg.rate,0.5));
+  const base=clamp(Math.round(finiteOr(cfg.baseStep,current)),0,47);
+  if(depth<=0) return base;
+  const cycle=Math.floor(seconds*rate/60);
+  if(cfg.wave==='binary'){
+    // Binary is deliberately hard-switched: one side of the slider range,
+    // then the opposite side, at the selected LFO rate. At full range it
+    // literally alternates between the slider extremes: 0 and 47.
+    if(depth>=24) return (cycle%2===0)?0:47;
+    return sliderBoundedStep(base,(cycle%2===0)?-depth:depth);
+  }
+  if(cfg.wave==='random'){
+    // Random is true sample-and-hold: each LFO cycle chooses a new integer
+    // hour-slider position inside the chosen range and holds it until the
+    // next cycle.
+    const u=seededUnit(cycle);
+    const lo=Math.max(0,base-depth), hi=Math.min(47,base+depth);
+    return clamp(Math.round(lo+u*(hi-lo)),0,47);
+  }
+  const swing=Math.round(timeLfoBipolarAt(seconds,cfg)*depth);
+  return sliderBoundedStep(base,swing);
+}
+function makeExportSkyCache(cfg){
+  cfg=cfg||timeLfoSettings();
+  const cache=new Map();
+  return {
+    get(seconds){
+      const step=cfg.enabled?timeLfoStepAt(seconds,cfg):((parseInt(els.hour.value,10)||0)%48+48)%48;
+      if(!cache.has(step)){
+        const date=dateForLocalHour(cfg.lon==null?state.lon:cfg.lon, 18+step*0.5);
+        cache.set(step, computeSkyForDate(date, cfg.lat==null?state.lat:cfg.lat, cfg.lon==null?state.lon:cfg.lon));
+      }
+      return cache.get(step);
+    }
+  };
+}
+let timeLfoTimer=null;
+function syncTimeLfoUI(){
+  if(els.timeLfoRateVal) els.timeLfoRateVal.textContent=(parseFloat(els.timeLfoRate.value)||0).toFixed(2)+'/min';
+  if(els.timeLfoRangeVal){ const r=parseInt(els.timeLfoRange.value,10)||0; els.timeLfoRangeVal.textContent='±'+(r/2).toFixed(1)+'h'; }
+}
+function runTimeLfoTick(){
+  const cfg=timeLfoSettings();
+  if(!cfg.enabled || !state.rendered) return;
+  if(!state.timeLfoStartedAt) state.timeLfoStartedAt=performance.now();
+  const sec=(performance.now()-state.timeLfoStartedAt)/1000;
+  const step=timeLfoStepAt(sec,cfg);
+  if((parseInt(els.hour.value,10)||0)!==step){
+    state.useNow=false;
+    els.hour.value=step;
+    doRender({silent:true});
+  }
+}
+function restartTimeLfo(){
+  syncTimeLfoUI();
+renderTimeSignatureUI();
+  state.timeLfoBaseStep=((parseInt(els.hour.value,10)||0)%48+48)%48;
+  state.timeLfoStartedAt=performance.now();
+  if(timeLfoTimer){ clearInterval(timeLfoTimer); timeLfoTimer=null; }
+  if(timeLfoSettings().enabled){
+    runTimeLfoTick();
+    timeLfoTimer=setInterval(runTimeLfoTick,500);
+    log('Time LFO active — range moves the actual Time of night slider for live playback and exports. Random holds a new value each cycle; Binary jumps between extremes.');
+  }
+}
+
+function parseTimeSignature(str){
+  const m=String(str||'').trim().match(/^(\d{1,2})\s*\/\s*(\d{1,2})$/);
+  if(!m) return {num:4, den:4, text:'4/4'};
+  let num=Math.max(1, Math.min(32, parseInt(m[1],10)||4));
+  let den=parseInt(m[2],10)||4;
+  const valid=[1,2,4,8,16,32];
+  if(!valid.includes(den)) den=4;
+  return {num, den, text:num+'/'+den};
+}
+function getTimeSignature(){ return parseTimeSignature(els.timeSignature&&els.timeSignature.value); }
+function renderTimeSignatureUI(){ if(els.timeSignature){ const ts=getTimeSignature(); els.timeSignature.value=ts.text; } }
+function tsDenPower(den){ return Math.max(0, Math.round(Math.log2(Math.max(1,den)))); }
+function applyTimeSignatureChange(silent){
+  renderTimeSignatureUI();
+  const ts=getTimeSignature();
+  voices.forEach(v=>rebuildVoicePhrase(v));
+  try{ if(typeof Tone!=='undefined'&&Tone.Transport) Tone.Transport.timeSignature=[ts.num, ts.den]; }catch(e){}
+  updateReadout();
+  if(!silent) log('Time signature set to '+ts.text+' — phrase loops rebuilt for playback and export.');
+}
+
 /* ── MIDI export (Standard MIDI File, Type 1) ─────────────────────────────── */
 const PPQ=480;
 function vlq(value){ const b=[value&0x7f]; value>>=7; while(value>0){ b.unshift((value&0x7f)|0x80); value>>=7; } return b; }
 function strBytes(s){ return [...s].map(c=>c.charCodeAt(0)&0x7f); }
 function trackChunk(ev){ const len=ev.length; return [0x4d,0x54,0x72,0x6b,(len>>>24)&0xff,(len>>>16)&0xff,(len>>>8)&0xff,len&0xff,...ev]; }
-function notesToTrackEvents(notes, channel, program, name, pan){
+function notesToTrackEvents(notes, channel, program, name, pan, panEvents){
   const evs=[];
   evs.push({tick:0,kind:0,bytes:[0xff,0x03,Math.min(127,name.length),...strBytes(name).slice(0,127)]});
   evs.push({tick:0,kind:0,bytes:[0xc0|channel, program&0x7f]});
   if(pan!=null) evs.push({tick:0,kind:0,bytes:[0xb0|channel,10,clamp(Math.round(64+pan*63),0,127)]});
+  if(Array.isArray(panEvents)){
+    panEvents.forEach(pe=>{
+      const tick=Math.max(0,Math.round(finiteOr(pe.beat,0)*PPQ));
+      const val=clamp(Math.round(64+clamp(finiteOr(pe.pan,0),-1,1)*63),0,127);
+      evs.push({tick,kind:0,bytes:[0xb0|channel,10,val]});
+    });
+  }
   for(const n of notes){ const onT=Math.round(n.startBeat*PPQ), offT=Math.max(onT+1,Math.round((n.startBeat+n.durBeat)*PPQ));
     const note=clamp(n.midi|0,0,127), vel=clamp(n.vel|0,1,127);
     evs.push({tick:onT,kind:1,bytes:[0x90|channel,note,vel]}); evs.push({tick:offT,kind:0,bytes:[0x80|channel,note,0x40]}); }
   evs.sort((a,b)=>a.tick-b.tick || a.kind-b.kind);
   const out=[]; let prev=0; for(const e of evs){ out.push(...vlq(e.tick-prev),...e.bytes); prev=e.tick; }
   out.push(...vlq(0),0xff,0x2f,0x00); return out;
+}
+function midiMetaEventObjects(tempo, title){
+  const uspq=Math.round(60000000/tempo), ts=getTimeSignature(), name=title||'Sky to MIDI';
+  return [
+    {tick:0,kind:0,bytes:[0xff,0x51,0x03,(uspq>>>16)&0xff,(uspq>>>8)&0xff,uspq&0xff]},
+    {tick:0,kind:0,bytes:[0xff,0x58,0x04,ts.num,tsDenPower(ts.den),24,8]},
+    {tick:0,kind:0,bytes:[0xff,0x03,Math.min(127,name.length),...strBytes(name).slice(0,127)]}
+  ];
+}
+function midiVoiceEventObjects(notes, channel, program, name, pan, panEvents){
+  const evs=[], label=String(name||'Voice');
+  evs.push({tick:0,kind:0,bytes:[0xff,0x01,Math.min(127,label.length),...strBytes(label).slice(0,127)]});
+  evs.push({tick:0,kind:0,bytes:[0xc0|channel, program&0x7f]});
+  if(pan!=null) evs.push({tick:0,kind:0,bytes:[0xb0|channel,10,clamp(Math.round(64+pan*63),0,127)]});
+  if(Array.isArray(panEvents)){
+    panEvents.forEach(pe=>{
+      const tick=Math.max(0,Math.round(finiteOr(pe.beat,0)*PPQ));
+      const val=clamp(Math.round(64+clamp(finiteOr(pe.pan,0),-1,1)*63),0,127);
+      evs.push({tick,kind:0,bytes:[0xb0|channel,10,val]});
+    });
+  }
+  for(const n of notes){
+    const onT=Math.round(finiteOr(n.startBeat,0)*PPQ), offT=Math.max(onT+1,Math.round((finiteOr(n.startBeat,0)+finiteOr(n.durBeat,0.5))*PPQ));
+    const note=clamp(n.midi|0,0,127), vel=clamp(n.vel|0,1,127);
+    evs.push({tick:onT,kind:1,bytes:[0x90|channel,note,vel]});
+    evs.push({tick:offT,kind:0,bytes:[0x80|channel,note,0x40]});
+  }
+  return evs;
+}
+function midiEventsToTrackData(evs){
+  evs.sort((a,b)=>a.tick-b.tick || a.kind-b.kind);
+  const out=[]; let prev=0;
+  for(const e of evs){ const dt=Math.max(0,e.tick-prev); out.push(...vlq(dt),...e.bytes); prev=e.tick; }
+  out.push(...vlq(0),0xff,0x2f,0x00);
+  return out;
+}
+function createMidiSingleTrack(list, tempo, durationSec, cfg, title){
+  cfg=cfg||timeLfoSettings();
+  const totalBeats=durationSec*tempo/60, evs=midiMetaEventObjects(tempo, title||'Sky to MIDI · full render');
+  const panCache=cfg.enabled?makeExportSkyCache(cfg):null;
+  let ch=0;
+  for(const v of list){
+    const notes=cfg.enabled?voiceExportNotesDynamic(v,totalBeats,tempo,cfg):voiceExportNotes(v,totalBeats);
+    if(!notes.length) continue;
+    let channel=(ch===9?10:ch)%16;
+    const program=(v.palette&&v.palette.gm!=null?v.palette.gm:0);
+    const panSky=cfg.enabled?panCache.get(0):state.sky;
+    const panEvents=midiPanEventsForVoice(v,totalBeats,tempo,cfg);
+    evs.push(...midiVoiceEventObjects(notes, channel, program, v.label||'Voice', panForStarsAtSky(v.starIds, panSky), panEvents));
+    ch++;
+    if(v.mode==='dub' && v.dubBass && v.dubBass.phrase){
+      const bnotes=cfg.enabled?dubBassExportNotesDynamic(v,totalBeats,tempo,cfg):dubBassExportNotes(v,totalBeats);
+      if(bnotes.length){
+        channel=(ch===9?10:ch)%16;
+        evs.push(...midiVoiceEventObjects(bnotes, channel, 38, (v.label||'Voice')+' · Dub bass', 0));
+        ch++;
+      }
+    }
+  }
+  const track=trackChunk(midiEventsToTrackData(evs));
+  const header=[0x4d,0x54,0x68,0x64,0,0,0,6,0,0,0,1,(PPQ>>8)&0xff,PPQ&0xff];
+  return new Uint8Array([...header,...track]);
 }
 function voiceExportNotes(v, totalBeats){
   const ph=v.phrase; if(!ph||!ph.notes.length) return [];
@@ -884,18 +1195,67 @@ function dubBassExportNotes(v, totalBeats){
   }
   return out;
 }
-function createMidi(list, tempo, durationSec){
+function voiceExportNotesDynamic(v, totalBeats, tempo, cfg){
+  const stepsPerBeat=2, totalSteps=Math.ceil(totalBeats*stepsPerBeat), out=[];
+  const densityProb=parseInt(els.density.value,10)/100, magCut=lerp(0.6,5.2,densityProb);
+  const cache=makeExportSkyCache(cfg), palette=modePalette(v.sourcePalette||v.palette, v.mode);
+  for(let s=0;s<totalSteps;s++){
+    const sec=(s/stepsPerBeat)*60/tempo, sky=cache.get(sec);
+    const ph=phraseFromStarsAtSky(v.starIds, palette, v.mode, sky, cfg);
+    if(!ph||!ph.notes||!ph.notes.length) continue;
+    const local=s%Math.max(1,ph.loopSteps);
+    for(const n of ph.notes){ if(n.step!==local) continue; const bright=n.mag<=magCut||n===ph.notes[0]; if(!bright) continue;
+      out.push({ startBeat:s/stepsPerBeat, durBeat:durBeats(n.dur), midi:n.midi, vel:n.vel });
+    }
+  }
+  return out;
+}
+function dubBassExportNotesDynamic(v, totalBeats, tempo, cfg){
+  const stepsPerBeat=2, totalSteps=Math.ceil(totalBeats*stepsPerBeat), out=[];
+  const cache=makeExportSkyCache(cfg), palette=modePalette(v.sourcePalette||v.palette, v.mode);
+  for(let s=0;s<totalSteps;s++){
+    const sec=(s/stepsPerBeat)*60/tempo, sky=cache.get(sec);
+    const ph=phraseFromStarsAtSky(v.starIds, palette, v.mode, sky, cfg);
+    if(!ph) continue;
+    const db=buildDubBassPhrase(v.starIds, ph, cfg.key);
+    const local=s%Math.max(1,finiteOr(db.loopSteps,1));
+    for(const b of db.pulses){ if(b.step!==local) continue; out.push({ startBeat:s/stepsPerBeat, durBeat:durBeats(b.dur), midi:b.midi, vel:b.vel }); }
+  }
+  return out;
+}
+function midiPanEventsForVoice(v,totalBeats,tempo,cfg){
+  if(!cfg || !cfg.enabled) return null;
+  const cache=makeExportSkyCache(cfg), out=[];
+  const totalSec=totalBeats*60/tempo, hop=0.5;
+  let last=null;
+  for(let t=0; t<=totalSec+0.001; t+=hop){
+    const pan=clamp(panForStarsAtSky(v.starIds||[], cache.get(t)),-0.85,0.85);
+    if(!Number.isFinite(pan)) continue;
+    const val=Math.round((pan+1)*63.5);
+    if(last===val && t>0) continue;
+    out.push({beat:t*tempo/60, pan});
+    last=val;
+  }
+  return out;
+}
+function createMidi(list, tempo, durationSec, cfg, mode){
+  cfg=cfg||timeLfoSettings();
+  if(mode==='single') return createMidiSingleTrack(list, tempo, durationSec, cfg, 'Sky to MIDI · full render');
   const totalBeats=durationSec*tempo/60, uspq=Math.round(60000000/tempo), title='Sky to MIDI';
+  const ts=getTimeSignature();
   const meta=[ ...vlq(0),0xff,0x51,0x03,(uspq>>>16)&0xff,(uspq>>>8)&0xff,uspq&0xff,
-               ...vlq(0),0xff,0x58,0x04,4,2,24,8,
+               ...vlq(0),0xff,0x58,0x04,ts.num,tsDenPower(ts.den),24,8,
                ...vlq(0),0xff,0x03,strBytes(title).length,...strBytes(title),
                ...vlq(0),0xff,0x2f,0x00 ];
   const tracks=[trackChunk(meta)]; let ch=0;
-  for(const v of list){ const notes=voiceExportNotes(v,totalBeats); if(!notes.length) continue;
+  for(const v of list){
+    const notes=cfg.enabled?voiceExportNotesDynamic(v,totalBeats,tempo,cfg):voiceExportNotes(v,totalBeats); if(!notes.length) continue;
     let channel=(ch===9?10:ch)%16; const program=(v.palette.gm!=null?v.palette.gm:0);
-    tracks.push(trackChunk(notesToTrackEvents(notes, channel, program, v.label||'Voice', panForStars(v.starIds)))); ch++;
+    const panSky=cfg.enabled?makeExportSkyCache(cfg).get(0):state.sky;
+    const panEvents=midiPanEventsForVoice(v,totalBeats,tempo,cfg);
+    tracks.push(trackChunk(notesToTrackEvents(notes, channel, program, v.label||'Voice', panForStarsAtSky(v.starIds, panSky), panEvents))); ch++;
     if(v.mode==='dub' && v.dubBass && v.dubBass.phrase){
-      const bnotes=dubBassExportNotes(v,totalBeats);
+      const bnotes=cfg.enabled?dubBassExportNotesDynamic(v,totalBeats,tempo,cfg):dubBassExportNotes(v,totalBeats);
       if(bnotes.length){ channel=(ch===9?10:ch)%16; tracks.push(trackChunk(notesToTrackEvents(bnotes, channel, 38, (v.label||'Voice')+' · Dub bass', 0))); ch++; }
     }
   }
@@ -903,16 +1263,35 @@ function createMidi(list, tempo, durationSec){
   const header=[0x4d,0x54,0x68,0x64,0,0,0,6,0,1,(n>>8)&0xff,n&0xff,(PPQ>>8)&0xff,PPQ&0xff];
   const all=[...header]; tracks.forEach(t=>all.push(...t)); return new Uint8Array(all);
 }
+function updateMidiDownloadLabel(){
+  if(!els.midiMode || !els.downloadMidi) return;
+  els.downloadMidi.textContent=els.midiMode.value==='stems'?'Download MIDI stems':'Download full MIDI';
+}
 function downloadMidi(){
+  applyTimeSignatureChange(true);
   const list=[...voices.values()].filter(v=>v.phrase&&v.phrase.notes.length);
   if(!list.length){ log('Nothing to export yet — activate a constellation or draw a line first.',true); return; }
-  const dur=parseInt(els.midiDur.value,10), bytes=createMidi(list, parseInt(els.tempo.value,10), dur);
-  const blob=new Blob([bytes],{type:'audio/midi'}), url=URL.createObjectURL(blob), a=document.createElement('a');
-  a.href=url; a.download='sky-to-midi.mid'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1500);
-  log('Exported '+list.length+' track'+(list.length>1?'s':'')+' · '+dur+'s of MIDI.');
+  const dur=parseInt(els.midiDur.value,10), tempo=parseInt(els.tempo.value,10), lfo=timeLfoSettings();
+  const mode=els.midiMode?els.midiMode.value:'full';
+  if(mode==='stems'){
+    const files=[];
+    list.forEach((v,i)=>{
+      const bytes=createMidi([v], tempo, dur, lfo, 'single');
+      files.push({ name:String(i+1).padStart(2,'0')+'-'+sanitizeFilePart(v.label||'constellation')+'.mid', data:bytes });
+    });
+    const zip=buildZip(files);
+    triggerDownloadBlob(new Blob([zip],{type:'application/zip'}),'sky-to-midi-midi-stems.zip');
+    log('Exported '+files.length+' MIDI stem'+(files.length>1?'s':'')+' as one ZIP · '+dur+'s each'+(lfo.enabled?' with Time LFO.':'.'));
+    return;
+  }
+  const bytes=createMidi(list, tempo, dur, lfo, 'single');
+  const blob=new Blob([bytes],{type:'audio/midi'});
+  triggerDownloadBlob(blob,'sky-to-midi-full.mid');
+  log('Exported full MIDI render as one track · '+list.length+' constellation'+(list.length>1?'s':'')+' · '+dur+'s'+(lfo.enabled?' with Time LFO.':'.'));
 }
 
-/* ── Offline audio export — faster-than-realtime, frozen at click ─────── */
+
+/* ── Audio export: Tone.js mirror first, native fallback second ───────────── */
 function clonePaletteForAudio(p){
   const q=Object.assign({}, p||PALETTES[1]);
   q.env=Object.assign({}, (p&&p.env)||{});
@@ -937,7 +1316,7 @@ function snapshotAudioState(list, durationSec){
     palette:clonePaletteForAudio(v.palette), soundPalette:clonePaletteForAudio(v.soundPalette||v.palette),
     phrase:clonePhraseForAudio(v.phrase), dubBass:cloneDubBassForAudio(v.dubBass)
   })).filter(v=>v.phrase&&v.phrase.notes&&v.phrase.notes.length);
-  return { durationSec, tempo, density, volume, voices:voicesSnap };
+  return { durationSec, tempo, density, volume, timeLfo:timeLfoSettings(), voices:voicesSnap };
 }
 function audioNotesFromPhrase(ph, totalBeats, density){
   if(!ph||!ph.notes||!ph.notes.length) return [];
@@ -1043,7 +1422,7 @@ function makeOfflineVoiceInput(ctx, snap, master, tempo){
   }else{
     bassInput.connect(voiceGain);
   }
-  return {input,bassInput};
+  return {input,bassInput,panner};
 }
 function midiToHz(midi){ return 440*Math.pow(2,(midi-69)/12); }
 function finiteOr(v, fallback){ v=Number(v); return Number.isFinite(v)?v:fallback; }
@@ -1063,52 +1442,237 @@ function safeRamp(param, value, time){
   param.linearRampToValueAtTime(value, time);
   return true;
 }
+function safeCurve(param, values, start, duration){
+  if(!param || !values || !values.length || !Number.isFinite(start) || !Number.isFinite(duration) || duration<=0) return false;
+  try{ param.setValueCurveAtTime(new Float32Array(values), start, Math.max(0.001,duration)); return true; }
+  catch(e){ return false; }
+}
 function safeSet(param, value, time){
   if(!param || !Number.isFinite(value) || !Number.isFinite(time)) return false;
   param.setValueAtTime(value, time);
   return true;
 }
+function scheduleOfflinePanning(ctx, panner, starIds, durationSec, cfg, fallbackPan){
+  if(!panner || !panner.pan) return;
+  const param=panner.pan;
+  try{ param.cancelScheduledValues(0); }catch(e){}
+  fallbackPan=clamp(finiteOr(fallbackPan,0),-1,1);
+  safeSet(param,fallbackPan,0);
+  if(!cfg || !cfg.enabled || !starIds || !starIds.length) return;
+
+  // Live playback re-renders the sky every ~500 ms and ramps Tone.Panner over 0.2 s.
+  // The offline renderer now mirrors that behaviour instead of freezing pan at export start.
+  const cache=makeExportSkyCache(cfg);
+  const hop=0.5, ramp=0.2;
+  let last=fallbackPan;
+  for(let t=0; t<=durationSec+hop; t+=hop){
+    const sky=cache.get(t);
+    const pan=clamp(panForStarsAtSky(starIds, sky),-0.85,0.85);
+    if(!Number.isFinite(pan)) continue;
+    const hold=safeTime(ctx,t,t);
+    safeSet(param,last,hold);
+    const end=safeTime(ctx,Math.min(durationSec,t+ramp),hold+ramp);
+    safeRamp(param,pan,end);
+    last=pan;
+  }
+}
 function scheduleOfflineNote(ctx, dest, midi, start, dur, vel, palette, levelScale){
   const ctxDur=offlineDuration(ctx);
   start=finiteOr(start, NaN); dur=finiteOr(dur, 0.25); midi=finiteOr(midi, NaN); vel=finiteOr(vel, 80); levelScale=finiteOr(levelScale,1);
   if(!ctx || !dest || !Number.isFinite(start) || !Number.isFinite(dur) || !Number.isFinite(midi) || start>=ctxDur-0.01 || start<0) return;
-  const env=Object.assign({attack:0.01,decay:0.25,sustain:0.2,release:0.6}, palette&&palette.env||{});
+
+  const env=Object.assign({attack:0.014,decay:0.25,sustain:0.2,release:0.6}, palette&&palette.env||{});
   const f=finiteOr(midiToHz(midi), 440);
-  const amp=clamp(vel/127,0,1)*0.30*clamp(levelScale,0,2);
-  const a=clamp(finiteOr(env.attack,0.01),0.001,8);
-  const d=clamp(finiteOr(env.decay,0.25),0.001,8);
+  const amp=clamp(vel/127,0,1)*0.27*clamp(levelScale,0,2);
+  const rawA=clamp(finiteOr(env.attack,0.014),0.001,8);
+  const rawD=clamp(finiteOr(env.decay,0.25),0.001,8);
   const s=clamp(finiteOr(env.sustain==null?0.25:env.sustain,0.25),0,1);
-  const r=clamp(finiteOr(env.release,0.3),0.02,12);
+  const rawR=clamp(finiteOr(env.release,0.3),0.02,12);
+
   const startT=safeTime(ctx,start,0);
-  const durT=Math.max(0.04,Math.min(finiteOr(dur,0.25),Math.max(0.04,ctxDur-startT)));
-  const noteEnd=safeTime(ctx,startT+durT,startT+0.25);
-  const aT=safeTime(ctx,startT+a,startT+0.01);
-  const dT=safeTime(ctx,Math.max(aT+0.0005,startT+a+d),aT+0.001);
-  const rT=safeTime(ctx,Math.max(noteEnd+0.0005,noteEnd+r),noteEnd+0.02);
-  const stopAt=Math.min(ctxDur, Math.max(rT+0.02, startT+0.06));
+  const durT=Math.max(0.08,Math.min(finiteOr(dur,0.25),Math.max(0.08,ctxDur-startT)));
+  const releaseStart=safeTime(ctx,startT+durT,startT+0.25);
+  const available=Math.max(0.012,releaseStart-startT);
+
+  // Keep the offline render close to Tone.js: fast note fronts with very short
+  // linear fade-in/fade-out ramps, avoiding both clicks and curve-event export errors.
+  const a=Math.min(Math.max(rawA*0.45,0.003), available*0.35);
+  const d=Math.min(Math.max(rawD*0.85,0.012), Math.max(0.010,available-a)*0.92);
+  const r=Math.max(rawR,0.09);
+  const aT=safeTime(ctx,startT+a,startT+0.006);
+  const dT=safeTime(ctx,Math.min(releaseStart-0.003,aT+d),aT+0.012);
+  const rT=safeTime(ctx,releaseStart+r,releaseStart+0.09);
+  const stopAt=Math.min(ctxDur, Math.max(rT+0.05, startT+0.08));
+
   const out=ctx.createGain();
+  out.gain.value=0;
+  try{ out.gain.cancelScheduledValues(0); }catch(e){}
+  // Avoid setValueCurveAtTime here: some browsers reject setValueAtTime/ramp events
+  // added during an active curve. Linear ramps keep the attack fast without export failure.
+  safeSet(out.gain,0,Math.max(0,startT-0.002));
   safeSet(out.gain,0,startT);
   safeRamp(out.gain,amp,aT);
   safeRamp(out.gain,amp*s,dT);
-  safeSet(out.gain,amp*s,noteEnd);
+  safeRamp(out.gain,amp*s,releaseStart);
   safeRamp(out.gain,0,rT);
   out.connect(dest);
+
+  const oscStart=Math.max(0,startT-0.002);
   if(palette&&palette.kind==='fm'){
     const carrier=ctx.createOscillator(), mod=ctx.createOscillator(), modGain=ctx.createGain();
-    carrier.type='sine'; mod.type='sine';
-    safeSet(carrier.frequency,f,startT); safeSet(mod.frequency,f*finiteOr(palette.harmonicity,2),startT);
-    safeSet(modGain.gain,f*finiteOr(palette.modIndex,5)*0.18,startT);
+    carrier.type='sine'; mod.type='sine'; modGain.gain.value=0;
+    safeSet(carrier.frequency,f,oscStart); safeSet(mod.frequency,f*finiteOr(palette.harmonicity,2),oscStart);
+    safeSet(modGain.gain,f*finiteOr(palette.modIndex,5)*0.18,oscStart);
     mod.connect(modGain); modGain.connect(carrier.frequency); carrier.connect(out);
-    carrier.start(startT); mod.start(startT); carrier.stop(stopAt); mod.stop(stopAt);
+    carrier.start(oscStart); mod.start(oscStart); carrier.stop(stopAt); mod.stop(stopAt);
   }else{
-    const osc=ctx.createOscillator(); osc.type=(palette&&palette.osc)||'sine'; safeSet(osc.frequency,f,startT);
+    const osc=ctx.createOscillator(); osc.type=(palette&&palette.osc)||'sine'; safeSet(osc.frequency,f,oscStart);
     const filter=ctx.createBiquadFilter(); filter.type='lowpass';
-    const baseCut=(osc.type==='sawtooth')?2200:(osc.type==='triangle'?5200:9000);
-    safeSet(filter.frequency,baseCut,startT); filter.Q.value=0.35;
-    osc.connect(filter); filter.connect(out); osc.start(startT); osc.stop(stopAt);
+    const baseCut=(osc.type==='sawtooth')?1800:(osc.type==='triangle'?4600:7600);
+    safeSet(filter.frequency,baseCut,oscStart); filter.Q.value=0.25;
+    osc.connect(filter); filter.connect(out); osc.start(oscStart); osc.stop(stopAt);
   }
 }
-async function renderOfflineAudio(snapshot){
+function audioNotesFromDynamicPhrase(v, totalBeats, snapshot){
+  const tempo=snapshot.tempo, stepsPerBeat=2, totalSteps=Math.ceil(Math.max(1,totalBeats)*stepsPerBeat), out=[];
+  const magCut=lerp(0.6,5.2,clamp(finiteOr(snapshot.density,55),0,100)/100);
+  const cache=makeExportSkyCache(snapshot.timeLfo), palette=modePalette(v.palette, v.mode);
+  for(let s=0;s<totalSteps;s++){
+    const sec=(s/stepsPerBeat)*60/tempo, sky=cache.get(sec);
+    const ph=phraseFromStarsAtSky(v.starIds, palette, v.mode, sky, snapshot.timeLfo);
+    if(!ph||!ph.notes||!ph.notes.length) continue;
+    const loopSteps=Math.max(1,Math.round(finiteOr(ph.loopSteps,1)));
+    const local=s%loopSteps;
+    ph.notes.forEach((n,i)=>{
+      const step=((Math.round(finiteOr(n.step,0))%loopSteps)+loopSteps)%loopSteps;
+      if(step!==local) return;
+      const mag=finiteOr(n.mag,0);
+      if(!(mag<=magCut||i===0)) return;
+      const midi=finiteOr(n.midi,NaN), vel=finiteOr(n.vel,80), durBeat=finiteOr(durBeats(n.dur),0.5);
+      if(Number.isFinite(midi)) out.push({ startBeat:s/stepsPerBeat, durBeat, midi, vel });
+    });
+  }
+  return out;
+}
+function audioDubBassNotesFromDynamicPhrase(v, totalBeats, snapshot){
+  const tempo=snapshot.tempo, stepsPerBeat=2, totalSteps=Math.ceil(Math.max(1,totalBeats)*stepsPerBeat), out=[];
+  const cache=makeExportSkyCache(snapshot.timeLfo), palette=modePalette(v.palette, v.mode);
+  for(let s=0;s<totalSteps;s++){
+    const sec=(s/stepsPerBeat)*60/tempo, sky=cache.get(sec);
+    const ph=phraseFromStarsAtSky(v.starIds, palette, v.mode, sky, snapshot.timeLfo);
+    if(!ph) continue;
+    const db=buildDubBassPhrase(v.starIds, ph, snapshot.timeLfo.key);
+    const loopSteps=Math.max(1, Math.round(finiteOr(db.loopSteps,1)));
+    const local=s%loopSteps;
+    db.pulses.forEach(b=>{
+      const step=((Math.round(finiteOr(b.step,0))%loopSteps)+loopSteps)%loopSteps;
+      if(step!==local) return;
+      const midi=finiteOr(b.midi,NaN), vel=finiteOr(b.vel,96), durBeat=finiteOr(durBeats(b.dur),0.5);
+      if(Number.isFinite(midi)) out.push({ startBeat:s/stepsPerBeat, durBeat, midi, vel });
+    });
+  }
+  return out;
+}
+function toneBufferToAudioBuffer(buf){
+  if(!buf) return null;
+  if(typeof AudioBuffer!=='undefined' && buf instanceof AudioBuffer) return buf;
+  if(buf.getChannelData && Number.isFinite(buf.numberOfChannels) && Number.isFinite(buf.sampleRate)) return buf;
+  if(buf._buffer && buf._buffer.getChannelData) return buf._buffer;
+  if(typeof buf.get==='function'){
+    try{ const native=buf.get(); if(native&&native.getChannelData) return native; }catch(e){}
+  }
+  return buf;
+}
+function makeToneSynthForPalette(palette){
+  if(palette&&palette.kind==='fm') return new Tone.PolySynth(Tone.FMSynth,{
+    harmonicity:palette.harmonicity, modulationIndex:palette.modIndex, oscillator:{type:'sine'}, envelope:palette.env,
+    modulationEnvelope:{attack:0.01,decay:0.3,sustain:0.2,release:0.4}
+  });
+  return new Tone.PolySynth(Tone.Synth,{ oscillator:{type:(palette&&palette.osc)||'sine'}, envelope:(palette&&palette.env)||{} });
+}
+function scheduleTonePanParam(param, starIds, durationSec, cfg, fallbackPan){
+  if(!param) return;
+  const set=(v,t)=>{ try{ if(param.setValueAtTime) param.setValueAtTime(v,t); else param.value=v; }catch(e){ try{ param.value=v; }catch(_e){} } };
+  const ramp=(v,t)=>{ try{ if(param.linearRampToValueAtTime) param.linearRampToValueAtTime(v,t); else set(v,t); }catch(e){ set(v,t); } };
+  fallbackPan=clamp(finiteOr(fallbackPan,0),-1,1);
+  try{ if(param.cancelScheduledValues) param.cancelScheduledValues(0); }catch(e){}
+  set(fallbackPan,0);
+  if(!cfg || !cfg.enabled || !starIds || !starIds.length) return;
+  const cache=makeExportSkyCache(cfg), hop=0.5, glide=0.2;
+  let last=fallbackPan;
+  for(let t=0;t<=durationSec+0.001;t+=hop){
+    const pan=clamp(panForStarsAtSky(starIds,cache.get(t)),-0.85,0.85);
+    if(!Number.isFinite(pan)) continue;
+    set(last,t);
+    ramp(pan,Math.min(durationSec,t+glide));
+    last=pan;
+  }
+}
+function buildToneOfflineVoice(v, master, tempo){
+  const beat=60/tempo;
+  const panNode=new Tone.Panner(clamp(v.pan||0,-1,1)).connect(master);
+  const gain=new Tone.Gain(clamp(v.gain||0.5,0,1.2)).connect(panNode);
+  let node=gain, fx=[];
+  if(v.mode==='ambient'){
+    const verb=new Tone.Reverb({decay:8.5,wet:0.58}).connect(gain);
+    const delay=new Tone.FeedbackDelay(2*beat,0.22).connect(verb); delay.wet.value=0.18;
+    fx.push(verb,delay); node=delay;
+  }else if(v.mode==='dub'){
+    const filt=new Tone.Filter(760,'lowpass').connect(gain);
+    const delay=new Tone.FeedbackDelay(0.5*beat,0.46).connect(filt); delay.wet.value=0.42;
+    fx.push(filt,delay); node=delay;
+  }else if(v.mode==='scatter'){
+    const delay=new Tone.FeedbackDelay(0.25*beat,0.18).connect(gain); delay.wet.value=0.22;
+    fx.push(delay); node=delay;
+  }else if(v.mode==='pedal'){
+    const filt=new Tone.Filter(1200,'lowpass').connect(gain);
+    fx.push(filt); node=filt;
+  }
+  const synth=makeToneSynthForPalette(v.soundPalette||v.palette).connect(node);
+  let bassSynth=null;
+  if(v.mode==='dub'){
+    const bassGain=new Tone.Gain(1.05).connect(gain);
+    const bassFilter=new Tone.Filter(210,'lowpass').connect(bassGain);
+    const bassDelay=new Tone.FeedbackDelay(1*beat,0.16).connect(bassGain); bassDelay.wet.value=0.10;
+    bassSynth=new Tone.Synth({ oscillator:{type:'sine'}, envelope:{attack:0.012,decay:0.24,sustain:0.72,release:0.92} }).connect(bassFilter);
+    bassSynth.connect(bassDelay);
+  }
+  return {synth,bassSynth,panNode,gain,fx};
+}
+function scheduleToneVoiceEvents(v, chain, snapshot){
+  const beat=60/snapshot.tempo, totalBeats=snapshot.durationSec*snapshot.tempo/60;
+  scheduleTonePanParam(chain.panNode&&chain.panNode.pan, v.starIds||[], snapshot.durationSec, snapshot.timeLfo, v.pan);
+  const notes=(snapshot.timeLfo&&snapshot.timeLfo.enabled)?audioNotesFromDynamicPhrase(v,totalBeats,snapshot):audioNotesFromPhrase(v.phrase,totalBeats,snapshot.density);
+  notes.forEach(n=>{
+    const st=finiteOr(n.startBeat,0)*beat, du=Math.max(0.015,finiteOr(n.durBeat,0.5)*beat);
+    if(st>=0 && st<snapshot.durationSec) try{ chain.synth.triggerAttackRelease(Tone.Frequency(n.midi,'midi').toFrequency(),du,st,clamp(finiteOr(n.vel,80)/127,0,1)); }catch(e){}
+  });
+  if(v.mode==='dub' && chain.bassSynth && v.dubBass&&v.dubBass.phrase){
+    const bass=(snapshot.timeLfo&&snapshot.timeLfo.enabled)?audioDubBassNotesFromDynamicPhrase(v,totalBeats,snapshot):audioDubBassNotesFromPhrase(v.dubBass.phrase,totalBeats);
+    bass.forEach(b=>{
+      const st=finiteOr(b.startBeat,0)*beat, du=Math.max(0.015,finiteOr(b.durBeat,0.5)*beat);
+      if(st>=0 && st<snapshot.durationSec) try{ chain.bassSynth.triggerAttackRelease(Tone.Frequency(b.midi,'midi').toFrequency(),du,st,clamp(finiteOr(b.vel,96)/127,0,1)); }catch(e){}
+    });
+  }
+}
+async function renderToneOfflineAudio(snapshot){
+  if(!window.Tone || !Tone.Offline) throw new Error('Tone.Offline unavailable');
+  const durationSec=clamp(snapshot.durationSec,1,600);
+  const rendered=await Tone.Offline(()=>{
+    try{ Tone.Transport.bpm.value=snapshot.tempo; }catch(e){}
+    const limiter=new Tone.Limiter(-2).toDestination();
+    const reverb=new Tone.Reverb({decay:4.2,wet:0.32}).connect(limiter);
+    const master=new Tone.Gain(0.8).connect(reverb);
+    snapshot.voices.forEach(v=>{
+      const chain=buildToneOfflineVoice(v,master,snapshot.tempo);
+      scheduleToneVoiceEvents(v,chain,snapshot);
+    });
+  }, durationSec);
+  const native=toneBufferToAudioBuffer(rendered);
+  if(!native || !native.getChannelData) throw new Error('Tone.Offline returned an unreadable buffer');
+  return native;
+}
+async function renderNativeOfflineAudio(snapshot){
   const sampleRate=(window.Tone&&Tone.context&&Tone.context.sampleRate)||48000;
   const durationSec=clamp(snapshot.durationSec,1,600);
   const ctx=new OfflineAudioContext(2, Math.ceil(durationSec*sampleRate), sampleRate);
@@ -1117,18 +1681,25 @@ async function renderOfflineAudio(snapshot){
   const beat=60/snapshot.tempo, totalBeats=durationSec*snapshot.tempo/60;
   snapshot.voices.forEach(v=>{
     const chain=makeOfflineVoiceInput(ctx, v, master, snapshot.tempo);
-    audioNotesFromPhrase(v.phrase,totalBeats,snapshot.density).forEach(n=>{
+    scheduleOfflinePanning(ctx, chain.panner, v.starIds||[], durationSec, snapshot.timeLfo, v.pan);
+    const noteList=(snapshot.timeLfo&&snapshot.timeLfo.enabled)?audioNotesFromDynamicPhrase(v,totalBeats,snapshot):audioNotesFromPhrase(v.phrase,totalBeats,snapshot.density);
+    noteList.forEach(n=>{
       const st=finiteOr(n.startBeat,0)*beat, du=finiteOr(n.durBeat,0.5)*beat;
       scheduleOfflineNote(ctx, chain.input, n.midi, st, du, n.vel, v.soundPalette, 1);
     });
     if(v.mode==='dub'&&v.dubBass&&v.dubBass.phrase){
-      audioDubBassNotesFromPhrase(v.dubBass.phrase,totalBeats).forEach(b=>{
+      const bassList=(snapshot.timeLfo&&snapshot.timeLfo.enabled)?audioDubBassNotesFromDynamicPhrase(v,totalBeats,snapshot):audioDubBassNotesFromPhrase(v.dubBass.phrase,totalBeats);
+      bassList.forEach(b=>{
         const st=finiteOr(b.startBeat,0)*beat, du=finiteOr(b.durBeat,0.5)*beat;
         scheduleOfflineNote(ctx, chain.bassInput, b.midi, st, du, b.vel, {kind:'synth',osc:'sine',env:{attack:0.012,decay:0.24,sustain:0.72,release:0.92}}, 1.12);
       });
     }
   });
   return await ctx.startRendering();
+}
+async function renderOfflineAudio(snapshot){
+  try{ return await renderToneOfflineAudio(snapshot); }
+  catch(e){ console.warn('Tone mirror render failed; using native fallback.',e); return await renderNativeOfflineAudio(snapshot); }
 }
 function encodeWav24(buffer){
   const channels=Math.min(2,buffer.numberOfChannels), sampleRate=buffer.sampleRate, frames=buffer.length;
@@ -1155,26 +1726,727 @@ function audioPeak(buffer){
   }
   return peak;
 }
+function sanitizeFilePart(s){
+  return String(s||'voice').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,48)||'voice';
+}
+function triggerDownloadBlob(blob, filename){
+  const url=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+const ZIP_CRC_TABLE=(()=>{ const t=new Uint32Array(256); for(let i=0;i<256;i++){ let c=i; for(let k=0;k<8;k++) c=(c&1)?(0xedb88320^(c>>>1)):(c>>>1); t[i]=c>>>0; } return t; })();
+function crc32(bytes){ let c=0xffffffff; for(let i=0;i<bytes.length;i++) c=ZIP_CRC_TABLE[(c^bytes[i])&255]^(c>>>8); return (c^0xffffffff)>>>0; }
+function pushU16(a,n){ a.push(n&255,(n>>>8)&255); }
+function pushU32(a,n){ a.push(n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255); }
+function zipDosTimeDate(date){
+  date=date||new Date();
+  const time=(date.getHours()<<11)|(date.getMinutes()<<5)|Math.floor(date.getSeconds()/2);
+  const dosDate=((date.getFullYear()-1980)<<9)|((date.getMonth()+1)<<5)|date.getDate();
+  return {time,date:dosDate};
+}
+function buildZip(files){
+  const enc=new TextEncoder(), now=zipDosTimeDate(new Date()), chunks=[], central=[]; let offset=0;
+  files.forEach(file=>{
+    const nameBytes=enc.encode(file.name), data=file.data instanceof Uint8Array?file.data:new Uint8Array(file.data);
+    const crc=crc32(data), local=[];
+    pushU32(local,0x04034b50); pushU16(local,20); pushU16(local,0); pushU16(local,0); pushU16(local,now.time); pushU16(local,now.date);
+    pushU32(local,crc); pushU32(local,data.length); pushU32(local,data.length); pushU16(local,nameBytes.length); pushU16(local,0);
+    chunks.push(new Uint8Array(local), nameBytes, data);
+    const cen=[];
+    pushU32(cen,0x02014b50); pushU16(cen,20); pushU16(cen,20); pushU16(cen,0); pushU16(cen,0); pushU16(cen,now.time); pushU16(cen,now.date);
+    pushU32(cen,crc); pushU32(cen,data.length); pushU32(cen,data.length); pushU16(cen,nameBytes.length); pushU16(cen,0); pushU16(cen,0); pushU16(cen,0); pushU16(cen,0); pushU32(cen,0); pushU32(cen,offset);
+    central.push(new Uint8Array(cen), nameBytes);
+    offset += local.length + nameBytes.length + data.length;
+  });
+  const centralSize=central.reduce((n,c)=>n+c.length,0), end=[];
+  pushU32(end,0x06054b50); pushU16(end,0); pushU16(end,0); pushU16(end,files.length); pushU16(end,files.length); pushU32(end,centralSize); pushU32(end,offset); pushU16(end,0);
+  const total=offset+centralSize+end.length, out=new Uint8Array(total); let p=0;
+  [...chunks,...central,new Uint8Array(end)].forEach(c=>{ out.set(c,p); p+=c.length; });
+  return out;
+}
 async function downloadAudio(){
+  applyTimeSignatureChange(true);
   const list=[...voices.values()].filter(v=>v.phrase&&v.phrase.notes.length);
   if(!list.length){ log('Nothing to export yet — activate a constellation or draw a line first.',true); return; }
   if(typeof OfflineAudioContext==='undefined'){ log('Offline audio export is not supported in this browser.',true); return; }
   const dur=parseInt(els.audioDur.value,10)||60;
+  const mode=(els.audioMode&&els.audioMode.value)||'mix';
   const snapshot=snapshotAudioState(list,dur);
   if(!snapshot.voices.length){ log('Nothing to export yet — activate a constellation or draw a line first.',true); return; }
   const prevText=els.downloadAudio.textContent;
-  els.downloadAudio.disabled=true; els.downloadAudio.textContent='Rendering…'; log('Rendering '+dur+'s offline audio. Playback controls and later parameter changes will not affect this file.');
+  els.downloadAudio.disabled=true;
+  els.downloadAudio.textContent=mode==='stems'?'Rendering stems…':'Rendering…';
   try{
     await new Promise(r=>setTimeout(r,20));
-    const buffer=await renderOfflineAudio(snapshot);
-    if(audioPeak(buffer)<0.00001) throw new Error('offline render produced silence; no valid events reached the renderer');
-    const wav=encodeWav24(buffer);
-    const blob=new Blob([wav],{type:'audio/wav'});
-    const url=URL.createObjectURL(blob); const a=document.createElement('a');
-    a.href=url; a.download='sky-to-midi-audio.wav'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1500);
-    log('Exported '+dur+'s stereo 24-bit WAV using the offline renderer.');
+    if(mode==='stems'){
+      const files=[];
+      for(let i=0;i<snapshot.voices.length;i++){
+        const v=snapshot.voices[i];
+        log('Rendering stem '+(i+1)+'/'+snapshot.voices.length+' · '+v.label+(snapshot.timeLfo&&snapshot.timeLfo.enabled?' · Time LFO active.':'.'));
+        const stemSnapshot=Object.assign({}, snapshot, { voices:[v] });
+        const buffer=await renderOfflineAudio(stemSnapshot);
+        if(audioPeak(buffer)<0.00001) throw new Error('stem "'+v.label+'" rendered silence; no valid events reached the renderer');
+        const wav=encodeWav24(buffer);
+        files.push({ name:String(i+1).padStart(2,'0')+'-'+sanitizeFilePart(v.label)+'.wav', data:new Uint8Array(wav) });
+      }
+      const zip=buildZip(files);
+      triggerDownloadBlob(new Blob([zip],{type:'application/zip'}),'sky-to-midi-stems.zip');
+      log('Exported '+files.length+' audio stem'+(files.length>1?'s':'')+' as one ZIP · '+dur+'s each using the live-playback mirror renderer'+(snapshot.timeLfo&&snapshot.timeLfo.enabled?' · Time LFO applied.':'.'));
+    }else{
+      log('Rendering '+dur+'s full audio mix with the Tone.js live-playback mirror'+(snapshot.timeLfo&&snapshot.timeLfo.enabled?' and Time LFO':'')+'.');
+      const buffer=await renderOfflineAudio(snapshot);
+      if(audioPeak(buffer)<0.00001) throw new Error('offline render produced silence; no valid events reached the renderer');
+      const wav=encodeWav24(buffer);
+      triggerDownloadBlob(new Blob([wav],{type:'audio/wav'}),'sky-to-midi-audio.wav');
+      log('Exported '+dur+'s full stereo 24-bit WAV using the live-playback mirror renderer.');
+    }
   }catch(e){ console.error(e); log('Audio export failed: '+e.message,true); }
   finally{ els.downloadAudio.disabled=false; els.downloadAudio.textContent=prevText; }
+}
+
+
+
+
+
+async function svgToImage(svgNode, width, height){
+  const cloned=svgNode.cloneNode(true);
+  cloned.setAttribute('xmlns','http://www.w3.org/2000/svg');
+  cloned.setAttribute('width', width||1000);
+  cloned.setAttribute('height', height||1000);
+  cloned.setAttribute('viewBox','0 0 1000 1000');
+  cloned.setAttribute('preserveAspectRatio','xMidYMid meet');
+  const style=document.createElementNS(SVGNS,'style');
+  style.textContent=`
+    .horizon{fill:#f7f5ef;stroke:#1b1b18;stroke-width:1.4;}
+    .altring{fill:none;stroke:#cfccbf;stroke-width:1;stroke-dasharray:2 4;}
+    .merid{stroke:#cfccbf;stroke-width:1;stroke-dasharray:2 5;}
+    .cardinal{fill:#4d4d46;font-size:13px;letter-spacing:.1em;font-family:"IBM Plex Mono",monospace;}
+    .cardinal.minor{fill:#8d8d83;font-size:10px;}
+    .centerx{stroke:#8d8d83;stroke-width:1;opacity:.9;}
+    .star{fill:#1b1b18;} .star.dim{fill:#8d8d83;}
+    .starhit{fill:transparent;}
+    .starlbl{fill:#4d4d46;font-size:9.5px;font-family:"IBM Plex Mono",monospace;letter-spacing:.04em;}
+    .figline{stroke:#8d8d83;stroke-width:.8;stroke-dasharray:1.5 3;fill:none;}
+    .figline.active{stroke:#1b1b18;stroke-width:1.5;stroke-dasharray:none;}
+    .userline{stroke:#1b1b18;stroke-width:1.5;fill:none;}
+    .userline.inactive{stroke:#8d8d83;stroke-dasharray:3 4;opacity:.58;}
+    .usernode{fill:#f7f5ef;stroke:#1b1b18;stroke-width:1.2;}
+    .usernode.inactive{stroke:#8d8d83;opacity:.58;}
+    .rubber{stroke:#1b1b18;stroke-width:1;stroke-dasharray:3 3;fill:none;opacity:.6;}
+    .anchor{fill:none;stroke:#1b1b18;stroke-width:1.4;}
+    .conlabel{fill:#4d4d46;font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-family:"IBM Plex Mono",monospace;}
+    .pulse{fill:none;stroke:#1b1b18;stroke-width:1.2;}
+  `;
+  cloned.insertBefore(style, cloned.firstChild);
+  const bg=document.createElementNS(SVGNS,'rect');
+  bg.setAttribute('x','0'); bg.setAttribute('y','0'); bg.setAttribute('width','1000'); bg.setAttribute('height','1000'); bg.setAttribute('fill','#f3f1ea');
+  cloned.insertBefore(bg, style.nextSibling);
+  const src='<?xml version="1.0" encoding="UTF-8"?>\n'+new XMLSerializer().serializeToString(cloned);
+  const blob=new Blob([src],{type:'image/svg+xml;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  try{
+    const img=await new Promise((resolve,reject)=>{
+      const im=new Image();
+      im.onload=()=>resolve(im);
+      im.onerror=reject;
+      im.src=url;
+    });
+    return img;
+  } finally { setTimeout(()=>URL.revokeObjectURL(url),500); }
+}
+function currentVisibleDrawings(){ return state.drawings.filter(dr=>dr.active!==false); }
+function starDisplayName(id){ const s=STARS[id]; return s?(s[3]||id):id; }
+function figureStarIds(abbr){
+  const out=[], seen=new Set(), fig=FIGURES[abbr];
+  if(!fig) return out;
+  fig.poly.forEach(pl=>pl.forEach(id=>{ if(!seen.has(id)){ seen.add(id); out.push(id); } }));
+  return out;
+}
+function midiLabel(midi){
+  midi=Math.round(finiteOr(midi,60));
+  const names=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  return names[((midi%12)+12)%12] + String(Math.floor(midi/12)-1);
+}
+function listVisibleStarData(ids, sky, limit){
+  const pts=(ids||[]).map(id=>sky&&sky.byId?sky.byId[id]:null).filter(st=>st&&st.alt>=0);
+  return pts.slice(0, limit||8).map(st=>`${starDisplayName(st.id)} alt ${st.alt.toFixed(1)}° az ${st.az.toFixed(1)}° mag ${finiteOr(st.mag,0).toFixed(2)}`).join(' · ');
+}
+function centroidStats(ids, sky){
+  const pts=(ids||[]).map(id=>sky&&sky.byId?sky.byId[id]:null).filter(st=>st&&st.alt>=0);
+  if(!pts.length) return {text:'below horizon', alt:null, az:null, spread:'—'};
+  const alt=pts.reduce((a,s)=>a+s.alt,0)/pts.length;
+  const az=pts.reduce((a,s)=>a+s.az,0)/pts.length;
+  const altMin=Math.min(...pts.map(p=>p.alt)), altMax=Math.max(...pts.map(p=>p.alt));
+  const azMin=Math.min(...pts.map(p=>p.az)), azMax=Math.max(...pts.map(p=>p.az));
+  return { text:`centroid alt ${alt.toFixed(1)}° · az ${az.toFixed(1)}°`, alt, az, spread:`alt span ${(altMax-altMin).toFixed(1)}° · az span ${(azMax-azMin).toFixed(1)}°` };
+}
+function voiceSonicSummary(v){
+  if(!v || !v.phrase || !v.phrase.notes || !v.phrase.notes.length) return 'no active phrase';
+  const mids=v.phrase.notes.map(n=>finiteOr(n.midi,60)).filter(Number.isFinite);
+  const min=Math.min(...mids), max=Math.max(...mids), loop=v.phrase.loopSteps||0;
+  const pan=panForStars(v.starIds||[]);
+  const densityProb=parseInt(els.density.value,10)/100;
+  return `${v.phrase.notes.length} notes · ${midiLabel(min)}–${midiLabel(max)} · ${loop} eighth-step loop · pan ${finiteOr(pan,0).toFixed(2)} · density ${(densityProb*100).toFixed(0)}%`;
+}
+function drawingPathInfo(dr, sky){
+  const pts=(dr.starIds||[]).map(id=>sky&&sky.byId?sky.byId[id]:null).filter(Boolean);
+  let path=0;
+  for(let i=1;i<pts.length;i++) path+=Math.hypot(pts[i].x-pts[i-1].x, pts[i].y-pts[i-1].y);
+  return `path ${(path/CHART.R).toFixed(2)}R · ${pts.length} points · ${dr.closed?'closed':'open'}`;
+}
+function uniqueRows(rows){
+  const seen=new Set(), out=[];
+  rows.forEach(([k,v])=>{
+    const key=(k+'|'+v).trim();
+    if(key && !seen.has(key)){ seen.add(key); out.push([k,v]); }
+  });
+  return out;
+}
+function topRightUniqueRows(activeVoices){
+  return [
+    ['Projection', 'polar horizon projection / local altitude–azimuth frame'],
+    ['Chart substrate', 'bright-star subset + historical figure polylines + user-drawn overlays'],
+    ['Render method', 'full-sky SVG snapshot, unzoomed, rasterised into an aligned archival page'],
+    ['Palette field', [...new Set(activeVoices.map(v=>v.palette&&v.palette.name||'').filter(Boolean))].join(', ') || 'none'],
+    ['Phrase lattice', activeVoices.map(v=>`${v.label}: ${v.phrase ? v.phrase.loopSteps : 0} steps`).join(' // ') || 'none active'],
+    ['Pseudo-code', 'for star in visible_set: pitch←altitude; velocity←magnitude; pan←azimuth; phrase←meter × count']
+  ];
+}
+function drawWrapped(ctx, text, x, y, maxWidth, lineHeight, maxLines){
+  const words=String(text||'').split(/\s+/).filter(Boolean); let line='', lines=0;
+  for(let i=0;i<words.length;i++){
+    const test=line?line+' '+words[i]:words[i];
+    if(ctx.measureText(test).width>maxWidth && line){ ctx.fillText(line,x,y); y+=lineHeight; line=words[i]; lines++; if(maxLines && lines>=maxLines) return y; }
+    else line=test;
+  }
+  if(line && (!maxLines || lines<maxLines)){ ctx.fillText(line,x,y); y+=lineHeight; }
+  return y;
+}
+function drawGrid(ctx,w,h){
+  ctx.save();
+  // fine measurement grid
+  ctx.strokeStyle='rgba(25,25,22,.035)'; ctx.lineWidth=1;
+  for(let x=48;x<w-32;x+=28){ ctx.beginPath(); ctx.moveTo(x,32); ctx.lineTo(x,h-32); ctx.stroke(); }
+  for(let y=48;y<h-32;y+=28){ ctx.beginPath(); ctx.moveTo(32,y); ctx.lineTo(w-32,y); ctx.stroke(); }
+  // coarse module grid
+  ctx.strokeStyle='rgba(25,25,22,.06)';
+  for(let x=48;x<w-32;x+=112){ ctx.beginPath(); ctx.moveTo(x,32); ctx.lineTo(x,h-32); ctx.stroke(); }
+  for(let y=48;y<h-32;y+=112){ ctx.beginPath(); ctx.moveTo(32,y); ctx.lineTo(w-32,y); ctx.stroke(); }
+  // outer frame
+  ctx.strokeStyle='rgba(25,25,22,.20)'; ctx.lineWidth=1; ctx.strokeRect(32,32,w-64,h-64);
+  // corner registration crosses
+  ctx.strokeStyle='rgba(25,25,22,.4)';
+  [[32,32],[w-32,32],[32,h-32],[w-32,h-32]].forEach(([cx,cy])=>{
+    ctx.beginPath(); ctx.moveTo(cx-8,cy); ctx.lineTo(cx+8,cy); ctx.moveTo(cx,cy-8); ctx.lineTo(cx,cy+8); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,cy,5,0,Math.PI*2); ctx.stroke();
+  });
+  ctx.restore();
+}
+function drawAsciiScatter(ctx,w,h,reserved){
+  ctx.save();
+  reserved = reserved || [];
+  const glyphs=[
+    '. ݁₊ ⊹ . ݁ ⟡ ݁ . ⊹ ₊ ݁.',
+    '⃝␥⋆',
+    '.𖥔 ݁ ˖ ᯓ★',
+    '⊹ ݁ ⟡ ݁ ⊹',
+    '· ⋆ ݁ ˖',
+    '✦ ݁ . ⊹',
+    '◌ ݁ ⋆ ݁ ◌',
+    '. ݁ ✧ ݁ .',
+    '⟡ ⊹ ·',
+    '∴ ݁ ⋆',
+  ];
+  const inReserved=(x,y)=>reserved.some(r=> x>r[0]-26 && x<r[0]+r[2]+26 && y>r[1]-18 && y<r[1]+r[3]+14);
+  let placed=0;
+  for(let i=0;i<420 && placed<150;i++){
+    const x=48 + seededUnit(i*2+7)*(w-150);
+    const y=60 + seededUnit(i*2+8)*(h-110);
+    if(inReserved(x,y)) continue;
+    const g=glyphs[Math.floor(seededUnit(i*3+11)*glyphs.length)%glyphs.length];
+    const size=7.5 + seededUnit(i*5+3)*5.5;
+    const alpha=0.05 + seededUnit(i*7+1)*0.10;
+    ctx.fillStyle=`rgba(27,27,24,${alpha.toFixed(3)})`;
+    ctx.font=size.toFixed(1)+'px "IBM Plex Mono", monospace';
+    ctx.fillText(g, x, y);
+    placed++;
+  }
+  ctx.restore();
+}
+function drawArtifacts(ctx,w,h){
+  ctx.save();
+  // faint dry-ink speckle, deterministic
+  for(let i=0;i<300;i++){
+    const x=32+seededUnit(i*4+13)*(w-64), y=32+seededUnit(i*4+14)*(h-64);
+    ctx.fillStyle=`rgba(25,25,22,${(0.015+seededUnit(i+5)*0.03).toFixed(3)})`;
+    ctx.fillRect(x,y,1,1);
+  }
+  // faint ecological arcs (registration drift)
+  ctx.strokeStyle='rgba(93,105,71,.14)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.arc(180, 1640, 150, Math.PI*.86, Math.PI*1.78); ctx.stroke();
+  ctx.beginPath(); ctx.arc(1460, 2180, 196, Math.PI*1.02, Math.PI*1.62); ctx.stroke();
+  // faded blueprint swatches
+  ctx.globalAlpha=.05;
+  ctx.fillStyle='#5d6947'; ctx.fillRect(60, 2402, 12, 12);
+  ctx.fillStyle='#a6533a'; ctx.fillRect(1480, 2402, 12, 12);
+  ctx.restore();
+}
+/* ── Capture astronomy helpers ──────────────────────────────────────────── */
+function airmassFor(altDeg){
+  if(altDeg<=3) return 30;
+  // Kasten & Young (1989) relative optical airmass
+  return 1/(Math.sin(rad(altDeg)) + 0.50572*Math.pow(altDeg+6.07995,-1.6364));
+}
+function isCircumpolar(decDeg, latDeg){
+  return latDeg>=0 ? decDeg >= (90-latDeg) : decDeg <= -(90+latDeg);
+}
+function fieldStats(sky, lat){
+  const up=sky.stars.slice();
+  const total=Object.keys(STARS).length;
+  let brightest=null, faintest=null, highest=null;
+  up.forEach(s=>{
+    if(!brightest || s.mag<brightest.mag) brightest=s;
+    if(!faintest || s.mag>faintest.mag) faintest=s;
+    if(!highest || s.alt>highest.alt) highest=s;
+  });
+  let circ=0; for(const id in STARS){ if(isCircumpolar(STARS[id][1], lat)) circ++; }
+  const xs=up.map(s=>airmassFor(s.alt));
+  const meanX=xs.length?xs.reduce((a,b)=>a+b,0)/xs.length:0;
+  return { up, total, brightest, faintest, highest, circ, meanX };
+}
+function azimuthSectors(sky, n){
+  const counts=new Array(n).fill(0);
+  sky.stars.forEach(s=>{ const k=Math.floor(((s.az%360)+360)%360 / (360/n))%n; counts[k]++; });
+  return counts;
+}
+
+/* ── Mini full-sky disc for the phase cycle ─────────────────────────────── */
+function miniSky(ctx, cx, cy, r, sky, activeAbbrs, emphasized){
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip();
+  ctx.fillStyle='#f7f5ef'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='rgba(27,27,24,.10)'; ctx.lineWidth=.6;
+  [30,60].forEach(a=>{ const rr=((90-a)/90)*r; ctx.beginPath(); ctx.arc(cx,cy,rr,0,Math.PI*2); ctx.stroke(); });
+  ctx.strokeStyle='rgba(27,27,24,.055)';
+  for(let k=0;k<8;k++){ const a=rad(k*45); ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx-r*Math.sin(a), cy-r*Math.cos(a)); ctx.stroke(); }
+  const map=(sx,sy)=>[ cx + (sx-CHART.cx)/CHART.R*r, cy + (sy-CHART.cy)/CHART.R*r ];
+  (activeAbbrs||[]).forEach(abbr=>{
+    const fig=FIGURES[abbr]; if(!fig) return;
+    ctx.strokeStyle=emphasized?'rgba(27,27,24,.50)':'rgba(27,27,24,.30)'; ctx.lineWidth=emphasized?1:.7;
+    fig.poly.forEach(pl=>{ for(let i=0;i<pl.length-1;i++){ const a=sky.byId[pl[i]], b=sky.byId[pl[i+1]];
+      if(a&&b&&a.alt>=0&&b.alt>=0){ const pa=map(a.x,a.y), pb=map(b.x,b.y); ctx.beginPath(); ctx.moveTo(pa[0],pa[1]); ctx.lineTo(pb[0],pb[1]); ctx.stroke(); } } });
+  });
+  sky.stars.forEach(s=>{
+    const [mx,my]=map(s.x,s.y);
+    const rr=clamp(2.0-(s.mag+1.5)*0.26, 0.32, 2.0)*(r/52);
+    ctx.fillStyle = s.mag<2.0 ? 'rgba(27,27,24,.9)' : 'rgba(27,27,24,.5)';
+    ctx.beginPath(); ctx.arc(mx,my,rr,0,Math.PI*2); ctx.fill();
+  });
+  ctx.restore();
+  ctx.strokeStyle=emphasized?'rgba(27,27,24,.85)':'rgba(27,27,24,.34)'; ctx.lineWidth=emphasized?1.6:1;
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+  ctx.strokeStyle='rgba(27,27,24,.28)'; ctx.lineWidth=.8;
+  ctx.beginPath(); ctx.moveTo(cx-3,cy); ctx.lineTo(cx+3,cy); ctx.moveTo(cx,cy-3); ctx.lineTo(cx,cy+3); ctx.stroke();
+}
+
+/* ── Phase cycle: real mini-skies four hours apart ──────────────────────── */
+function drawPhaseChart(ctx, x, y, w, h, clockHour, lat, lon, activeAbbrs){
+  const hours=[18,22,2,6,10,14];
+  const names=['Dusk','Evening','Deep night','Dawn','Morning','Afternoon'];
+  ctx.save();
+  ctx.fillStyle='#151513'; ctx.font='700 12.5px "IBM Plex Mono", monospace';
+  ctx.fillText('03 / DIURNAL PHASE CYCLE', x, y+12);
+  ctx.fillStyle='rgba(27,27,24,.36)'; ctx.font='8px "IBM Plex Mono", monospace';
+  ctx.fillText('FULL-SKY ROTATION SAMPLED AT FOUR-HOUR INTERVALS / EACH DISC RECOMPUTED FOR LOCAL TIME / CURRENT STATE EMPHASISED', x, y+24);
+
+  const n=hours.length, r=44, slot=w/n, baseY=y+30+r+8;
+  // current phase index by circular clock distance
+  const cur=hours.reduce((best,hh,idx)=>{
+    const d=Math.min(Math.abs(clockHour-hh), 24-Math.abs(clockHour-hh));
+    const db=Math.min(Math.abs(clockHour-hours[best]), 24-Math.abs(clockHour-hours[best]));
+    return d<db?idx:best; },0);
+  // baseline + ticks
+  ctx.strokeStyle='rgba(27,27,24,.16)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(x+slot*0.5, baseY+r+22); ctx.lineTo(x+w-slot*0.5, baseY+r+22); ctx.stroke();
+  for(let i=0;i<n;i++){
+    const cx=x+slot*(i+0.5), cy=baseY, emph=(i===cur);
+    const d=dateForLocalHour(lon, hours[i]);
+    const sky=computeSkyForDate(d, lat, lon);
+    miniSky(ctx, cx, cy, r, sky, activeAbbrs, emph);
+    // connector to baseline
+    ctx.strokeStyle='rgba(27,27,24,.16)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(cx, cy+r); ctx.lineTo(cx, baseY+r+22); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, baseY+r+22, emph?3.2:2, 0, Math.PI*2);
+    ctx.fillStyle=emph?'#1b1b18':'rgba(27,27,24,.4)'; ctx.fill();
+    // labels
+    ctx.textAlign='center';
+    ctx.fillStyle=emph?'#151513':'rgba(27,27,24,.62)'; ctx.font=(emph?'700 ':'')+'10px "IBM Plex Mono", monospace';
+    ctx.fillText(names[i], cx, cy-r-12);
+    ctx.fillStyle='rgba(27,27,24,.7)'; ctx.font='10px "IBM Plex Mono", monospace';
+    ctx.fillText(pad2(hours[i])+':00', cx, baseY+r+40);
+    ctx.fillStyle='rgba(27,27,24,.42)'; ctx.font='8px "IBM Plex Mono", monospace';
+    ctx.fillText(sky.stars.length+' up', cx, baseY+r+54);
+    if(emph){ ctx.fillStyle='rgba(27,27,24,.5)'; ctx.font='8px "IBM Plex Mono", monospace'; ctx.fillText('◀ current', cx, baseY+r+66); }
+  }
+  ctx.textAlign='left';
+  ctx.restore();
+}
+
+/* ── Panel frame + analysis diagrams ────────────────────────────────────── */
+function drawPanel(ctx,title,micro,x,y,w,h){
+  ctx.save();
+  ctx.strokeStyle='rgba(27,27,24,.18)'; ctx.lineWidth=1; ctx.strokeRect(x,y,w,h);
+  ctx.fillStyle='#151513'; ctx.font='700 12.5px "IBM Plex Mono", monospace'; ctx.fillText(title, x+14, y+22);
+  if(micro){ ctx.fillStyle='rgba(27,27,24,.36)'; ctx.font='8px "IBM Plex Mono", monospace'; drawWrapped(ctx,micro,x+14,y+34,w-28,10,2); }
+  ctx.restore();
+  return y+(micro?52:38);
+}
+function dgNode(ctx,x,y,w,h,top,bot){
+  ctx.strokeStyle='rgba(27,27,24,.5)'; ctx.lineWidth=1; ctx.strokeRect(x,y,w,h);
+  ctx.fillStyle='#151513'; ctx.font='600 9.5px "IBM Plex Mono", monospace'; ctx.textAlign='center';
+  ctx.fillText(top, x+w/2, y+h/2-1);
+  if(bot){ ctx.fillStyle='rgba(27,27,24,.5)'; ctx.font='8px "IBM Plex Mono", monospace'; ctx.fillText(bot, x+w/2, y+h/2+11); }
+  ctx.textAlign='left';
+}
+function dgArrow(ctx,x1,y1,x2,y2){
+  ctx.strokeStyle='rgba(27,27,24,.38)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  const ang=Math.atan2(y2-y1,x2-x1);
+  ctx.beginPath(); ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-6*Math.cos(ang-0.4), y2-6*Math.sin(ang-0.4));
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-6*Math.cos(ang+0.4), y2-6*Math.sin(ang+0.4));
+  ctx.stroke();
+}
+function drawProtocolDiagram(ctx,x,y,w,h,info){
+  const iy=drawPanel(ctx,'04 / SONIFICATION PROTOCOL','PARAMETER-MAPPING DECISION PATH / STAR FIELD TO SCORE',x,y,w,h);
+  ctx.save();
+  const cx=x+w/2, nw=w-90;
+  // 1 source
+  dgNode(ctx, cx-nw/2, iy+4, nw, 30, 'VISIBLE STAR FIELD', info.up+' stars above horizon');
+  // 2 three branches
+  const by=iy+78, bw=(w-56)/3, bh=34;
+  const bx=[x+18, x+18+bw+10, x+18+2*(bw+10)];
+  const branchTops=['ALTITUDE','MAGNITUDE','AZIMUTH'];
+  const branchBots=['→ pitch','→ velocity','→ pan'];
+  for(let i=0;i<3;i++){ dgNode(ctx,bx[i],by,bw,bh,branchTops[i],branchBots[i]); dgArrow(ctx,cx,iy+34,bx[i]+bw/2,by); }
+  // 3 merge
+  const my=by+bh+30, mw=nw;
+  dgNode(ctx, cx-mw/2, my, mw, 30, info.key+' '+info.scale, 'tonal gate · '+info.meter+' meter');
+  for(let i=0;i<3;i++) dgArrow(ctx, bx[i]+bw/2, by+bh, cx, my);
+  // 4 phrase
+  const py=my+60;
+  dgNode(ctx, cx-mw/2, py, mw, 30, 'PHRASE LATTICE', info.voices+' voices · '+info.loop+' eighth-step loop');
+  dgArrow(ctx, cx, my+30, cx, py);
+  // 5 export
+  const ey=py+60;
+  dgNode(ctx, cx-mw/2, ey, mw, 28, 'MIDI · WAV ARCHIVE', 'type-1 SMF · PPQ 480');
+  dgArrow(ctx, cx, py+30, cx, ey);
+  ctx.restore();
+}
+function drawDistributions(ctx,x,y,w,h,sky){
+  const iy=drawPanel(ctx,'05 / FIELD DISTRIBUTION','VISIBLE MAGNITUDE HISTOGRAM / ALTITUDE BAND PROFILE',x,y,w,h);
+  ctx.save();
+  // magnitude histogram
+  const magBins=[[-2,-1],[-1,0],[0,1],[1,2],[2,3],[3,4],[4,5]];
+  const mc=magBins.map(([a,b])=>sky.stars.filter(s=>s.mag>=a&&s.mag<b).length);
+  const mmax=Math.max(1,...mc);
+  const gx=x+18, gw=w-36, gtop=iy+10, gh=78, bw=gw/magBins.length;
+  ctx.fillStyle='rgba(27,27,24,.5)'; ctx.font='8px "IBM Plex Mono", monospace';
+  ctx.fillText('MAGNITUDE', gx, gtop-2);
+  ctx.strokeStyle='rgba(27,27,24,.16)'; ctx.beginPath(); ctx.moveTo(gx,gtop+gh); ctx.lineTo(gx+gw,gtop+gh); ctx.stroke();
+  magBins.forEach((b,i)=>{
+    const bh=mc[i]/mmax*gh, bx=gx+i*bw+2;
+    ctx.fillStyle='rgba(27,27,24,.7)'; ctx.fillRect(bx, gtop+gh-bh, bw-4, bh);
+    ctx.fillStyle='rgba(27,27,24,.5)'; ctx.textAlign='center'; ctx.font='8px "IBM Plex Mono", monospace';
+    ctx.fillText(String(b[1]), bx+(bw-4)/2, gtop+gh+11);
+    if(mc[i]>0){ ctx.fillStyle='rgba(27,27,24,.85)'; ctx.fillText(String(mc[i]), bx+(bw-4)/2, gtop+gh-bh-3); }
+  });
+  ctx.textAlign='left';
+  // altitude band profile (horizontal)
+  const altBins=[[0,15],[15,30],[30,45],[45,60],[60,75],[75,90]];
+  const regHint=['low pitch','','mid pitch','','','high pitch'];
+  const ac=altBins.map(([a,b])=>sky.stars.filter(s=>s.alt>=a&&s.alt<b).length);
+  const amax=Math.max(1,...ac);
+  const ax=x+90, atop=gtop+gh+34, aw=w-90-18, rowH=12, gap=5;
+  ctx.fillStyle='rgba(27,27,24,.5)'; ctx.font='8px "IBM Plex Mono", monospace'; ctx.fillText('ALTITUDE → PITCH', x+18, atop-6);
+  altBins.forEach((b,i)=>{
+    const ry=atop+i*(rowH+gap);
+    ctx.fillStyle='rgba(27,27,24,.5)'; ctx.font='8px "IBM Plex Mono", monospace';
+    ctx.fillText(pad2(b[0])+'-'+pad2(b[1])+'°', x+18, ry+rowH-2);
+    ctx.strokeStyle='rgba(27,27,24,.12)'; ctx.strokeRect(ax, ry, aw, rowH);
+    ctx.fillStyle='rgba(27,27,24,.62)'; ctx.fillRect(ax, ry, aw*(ac[i]/amax), rowH);
+    ctx.fillStyle='rgba(27,27,24,.85)'; ctx.font='8px "IBM Plex Mono", monospace';
+    ctx.fillText(String(ac[i]), ax+aw*(ac[i]/amax)+5, ry+rowH-2);
+  });
+  ctx.restore();
+}
+function drawSpatial(ctx,x,y,w,h,sky,voices){
+  const iy=drawPanel(ctx,'06 / SPATIAL + PITCH FIELD','AZIMUTH DENSITY ROSE → PAN / VOICE PITCH RANGE',x,y,w,h);
+  ctx.save();
+  // azimuth rose
+  const rcx=x+88, rcy=iy+72, rr=56, n=12;
+  const counts=azimuthSectors(sky,n), cmax=Math.max(1,...counts);
+  ctx.strokeStyle='rgba(27,27,24,.16)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.arc(rcx,rcy,rr,0,Math.PI*2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(rcx,rcy,rr*0.5,0,Math.PI*2); ctx.stroke();
+  for(let i=0;i<n;i++){
+    const a0=rad(i*(360/n))-Math.PI/2, frac=counts[i]/cmax, rad1=8+frac*(rr-10);
+    const a=rad(i*(360/n)); // 0 = N
+    const ang=-Math.PI/2 + a; // canvas: N up
+    const wedge=rad(360/n)*0.42;
+    ctx.fillStyle='rgba(27,27,24,.55)';
+    ctx.beginPath(); ctx.moveTo(rcx,rcy);
+    ctx.arc(rcx,rcy,rad1, ang-wedge, ang+wedge); ctx.closePath(); ctx.fill();
+  }
+  ctx.fillStyle='rgba(27,27,24,.6)'; ctx.font='8px "IBM Plex Mono", monospace'; ctx.textAlign='center';
+  ctx.fillText('N', rcx, rcy-rr-4); ctx.fillText('S', rcx, rcy+rr+10);
+  ctx.fillText('E', rcx-rr-8, rcy+3); ctx.fillText('W', rcx+rr+8, rcy+3);
+  ctx.textAlign='left';
+  ctx.fillStyle='rgba(27,27,24,.4)'; ctx.fillText('density → pan field', x+18, iy+150);
+  // pitch ribbon
+  const px=x+200, pw=w-200-18, lo=36, hi=96, py=iy+8;
+  ctx.fillStyle='rgba(27,27,24,.5)'; ctx.font='8px "IBM Plex Mono", monospace';
+  ctx.fillText('PITCH RANGE (MIDI '+lo+'–'+hi+')', px, py);
+  ctx.strokeStyle='rgba(27,27,24,.16)';
+  [0,0.5,1].forEach(t=>{ const xx=px+pw*t; ctx.beginPath(); ctx.moveTo(xx,py+8); ctx.lineTo(xx,py+150); ctx.stroke(); });
+  const vlist=voices.slice(0,7); const rh=18;
+  vlist.forEach((v,i)=>{
+    const mids=v.phrase.notes.map(nn=>finiteOr(nn.midi,60)).filter(Number.isFinite);
+    if(!mids.length) return;
+    const lo2=Math.max(lo,Math.min(...mids)), hi2=Math.min(hi,Math.max(...mids));
+    const ry=py+18+i*rh;
+    const ax=px+pw*((lo2-lo)/(hi-lo)), bx=px+pw*((hi2-lo)/(hi-lo));
+    ctx.fillStyle='rgba(27,27,24,.55)'; ctx.fillRect(ax, ry, Math.max(2,bx-ax), 4);
+    ctx.fillStyle='rgba(27,27,24,.75)'; ctx.font='8px "IBM Plex Mono", monospace';
+    const lbl=(v.label||'voice').slice(0,16);
+    ctx.fillText(lbl+' ('+mids.length+')', px, ry+12);
+  });
+  if(!vlist.length){ ctx.fillStyle='rgba(27,27,24,.42)'; ctx.font='9px "IBM Plex Mono", monospace'; ctx.fillText('no active voices', px, py+40); }
+  ctx.restore();
+}
+function blockRule(ctx,x,y,w){ ctx.strokeStyle='rgba(27,27,24,.12)'; ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+w,y); ctx.stroke(); }
+function drawLabelValue(ctx, k, v, x, y, w, compact){
+  ctx.font=`${compact?8:9}px "IBM Plex Mono", monospace`;
+  ctx.fillStyle='rgba(27,27,24,.52)';
+  ctx.fillText(String(k).toUpperCase(),x,y);
+  ctx.font=`${compact?11.5:12.5}px "IBM Plex Mono", monospace`;
+  ctx.fillStyle='#151513';
+  return drawWrapped(ctx,String(v),x,y+14,w,compact?13.5:15,compact?7:8)+4;
+}
+function drawTextBlock(ctx,title, rows, x, y, w, h, compact, microtext){
+  ctx.save();
+  ctx.strokeStyle='rgba(27,27,24,.18)'; ctx.strokeRect(x,y,w,h);
+  ctx.fillStyle='#151513'; ctx.font=`700 ${compact?12.5:15.5}px "IBM Plex Mono", monospace`; ctx.fillText(title,x+14,y+22);
+  if(microtext){
+    ctx.fillStyle='rgba(27,27,24,.36)'; ctx.font='8px "IBM Plex Mono", monospace';
+    drawWrapped(ctx,microtext,x+14,y+34,w-28,10,3);
+  }
+  let yy=y+(microtext?64:40);
+  rows=uniqueRows(rows);
+  rows.forEach(([k,v])=>{
+    if(yy>y+h-18) return;
+    yy=drawLabelValue(ctx,k,v,x+14,yy,w-28,compact);
+    blockRule(ctx,x+14,yy-2,w-28); yy+=compact?5:7;
+  });
+  ctx.restore();
+}
+function selectedConstellationRows(sky){
+  const rows=[];
+  [...state.active].forEach(abbr=>{
+    const fig=FIGURES[abbr], info=CONSTELLATION_INFO[abbr]||{}, ids=figureStarIds(abbr), visible=ids.filter(id=>sky.byId[id]&&sky.byId[id].alt>=0), ctr=centroidStats(ids,sky);
+    const v=voices.get('fig:'+abbr);
+    rows.push([
+      `${fig.name} / ${info.abbr||abbr}`,
+      [
+        info.meaning?`meaning: ${info.meaning}`:null,
+        info.archiveAge?`archive layer: ${info.archiveAge}`:null,
+        info.seasonal?`seasonality: ${info.seasonal}`:null,
+        info.note||null,
+        `palette: ${paletteById(fig.palette).name}`,
+        `${visible.length}/${ids.length} stars above horizon`,
+        ctr.text,
+        ctr.spread,
+        voiceSonicSummary(v),
+        `key stars: ${(info.stars||[]).slice(0,7).join(', ')}`,
+        `capture coordinates: ${listVisibleStarData(ids, sky, 6) || 'none above horizon'}`
+      ].filter(Boolean).join(' · ')
+    ]);
+  });
+  return rows.length?rows:[['No selected historical constellation','activate one or more classical constellations to populate this dossier block.']];
+}
+function drawnConstellationRows(sky){
+  const rows=[];
+  currentVisibleDrawings().forEach(dr=>{
+    const ctr=centroidStats(dr.starIds,sky);
+    const v=voices.get('usr:'+dr.id);
+    rows.push([
+      `${displayName(dr)} / user system`,
+      [
+        `palette: ${paletteById(dr.paletteId).name}`,
+        `mode: ${MODES[dr.mode]||dr.mode}`,
+        drawingPathInfo(dr, sky),
+        ctr.text,
+        ctr.spread,
+        voiceSonicSummary(v),
+        `nodes: ${(dr.starIds||[]).map(starDisplayName).join(', ')}`,
+        `capture coordinates: ${listVisibleStarData(dr.starIds, sky, 7) || 'none above horizon'}`
+      ].join(' · ')
+    ]);
+  });
+  return rows.length?rows:[['No drawn constellation','draw a line on the chart to archive a temporary user-defined constellation.']];
+}
+async function exportSkyCapture(){
+  try{
+    applyTimeSignatureChange(true);
+    // ── Page + modular grid ───────────────────────────────────────────────
+    const W=1600, H=2480, M=48, RIGHT=W-M, GUT=24;
+    const COLW=485, colX=i=>M + i*(COLW+GUT);   // 48 · 557 · 1066
+    const canvas=document.createElement('canvas'); canvas.width=W; canvas.height=H;
+    const ctx=canvas.getContext('2d');
+    ctx.fillStyle='#f3f1ea'; ctx.fillRect(0,0,W,H);
+    ctx.textBaseline='alphabetic'; ctx.textAlign='left';
+    drawGrid(ctx,W,H);
+    drawArtifacts(ctx,W,H);
+
+    const captureDate=new Date();
+    const sky=state.sky || computeSkyForDate(state.date,state.lat,state.lon);
+    const ts=getTimeSignature();
+    const lfo=timeLfoSettings();
+    const activeVoices=[...voices.values()].filter(v=>v.phrase&&v.phrase.notes.length);
+    const activeAbbrs=[...state.active];
+    const fs0=fieldStats(sky, state.lat);
+    const stepNow=((parseInt(els.hour.value,10)||0)%48+48)%48;
+    const clockHour=(18 + stepNow*0.5)%24;
+
+    // ── Vertical zones (top to bottom) ────────────────────────────────────
+    const mastRule=232;
+    const heroY=248, skyX=356, skySize=1092, heroBottom=heroY+skySize;       // 1340
+    const heroRule=heroBottom+16;                                            // 1356
+    const phaseY=1372;
+    const phaseRule=1580;
+    const anY=1596, anH=360;                                                 // analysis band
+    const dosY=1980, dosH=408;                                               // dossiers band
+    const footRule=2400;
+
+    // structural band rules
+    ctx.strokeStyle='rgba(27,27,24,.16)'; ctx.lineWidth=1;
+    [mastRule, heroRule, phaseRule, footRule].forEach(yy=>{ ctx.beginPath(); ctx.moveTo(M,yy); ctx.lineTo(RIGHT,yy); ctx.stroke(); });
+
+    // ── Masthead ──────────────────────────────────────────────────────────
+    ctx.fillStyle='#151513';
+    ctx.font='700 26px "IBM Plex Mono", monospace'; ctx.fillText('SKY CAPTURE /', M+2, 94);
+    ctx.fillText('SONIFICATION SUITE', M+2, 126);
+    ctx.font='700 60px "IBM Plex Mono", monospace'; ctx.fillText('Sky → MIDI', M+2, 196);
+    ctx.font='10px "IBM Plex Mono", monospace'; ctx.fillStyle='rgba(27,27,24,.56)';
+    ctx.fillText('SPECULATIVE CELESTIAL SONIFICATION · ARCHIVAL EXPORT', M+2, 222);
+
+    const palField=[...new Set(activeVoices.map(v=>v.palette&&v.palette.name).filter(Boolean))].join(', ')||'none';
+    const sysRows=[
+      ['Projection','polar horizon / local alt-az frame'],
+      ['Render','full-sky SVG snapshot, unzoomed'],
+      ['Palette field', palField],
+    ];
+    const sysW=372, sysX=RIGHT-sysW, sysY=68, sysH=146;
+    drawTextBlock(ctx,'02 / SYSTEM NOTES', sysRows, sysX, sysY, sysW, sysH, true, 'PROJECTION / RENDER METHOD / ACTIVE TIMBRE FIELD');
+
+    // ── Hero: capture log rail + always-full enlarged sky ─────────────────
+    const leftRows=[
+      ['Capture timestamp', captureDate.toLocaleString()],
+      ['Location', `${state.locLabel} (${state.lat.toFixed(4)}, ${state.lon.toFixed(4)})`],
+      ['Time-of-night slider', hourStepToLabel(parseInt(els.hour.value,10)||0)],
+      ['Local sky time', els.rTime.textContent||hourStepToLabel(parseInt(els.hour.value,10)||0)],
+      ['Sidereal time', els.rLst.textContent||'n/a'],
+      ['Stars above horizon', els.rStars.textContent||'n/a'],
+      ['Visible / catalogue', `${fs0.up.length} / ${fs0.total} stars`],
+      ['Brightest up', fs0.brightest?`${starDisplayName(fs0.brightest.id)} · mag ${fs0.brightest.mag.toFixed(2)} · alt ${fs0.brightest.alt.toFixed(1)}°`:'none'],
+      ['Near culmination', fs0.highest?`${starDisplayName(fs0.highest.id)} · alt ${fs0.highest.alt.toFixed(1)}° · zenith dist ${(90-fs0.highest.alt).toFixed(1)}°`:'none'],
+      ['Limiting magnitude', fs0.faintest?`mag ${fs0.faintest.mag.toFixed(2)} (faintest visible in subset)`:'none'],
+      ['Mean airmass', fs0.meanX?`${fs0.meanX.toFixed(2)} (visible field, sec z)`:'none'],
+      ['Circumpolar stars', `${fs0.circ} never set at latitude ${state.lat.toFixed(1)}°`],
+      ['Tonality', `${els.key.value} ${SCALES[els.scale.value].label}`],
+      ['Register', ({low:'Low',mid:'Middle',high:'High'}[els.register.value]||els.register.value)],
+      ['Time signature', ts.text],
+      ['Transport', `${els.tempo.value} BPM · density ${els.density.value}% · volume ${els.volume.value}%`],
+      ['Time LFO', lfo.enabled ? `${lfo.wave} · ${finiteOr(lfo.rate,0).toFixed(2)}/min · ±${((lfo.range||0)/2).toFixed(1)}h` : 'off'],
+      ['Archive ID', `sky-capture-${captureDate.getFullYear()}${pad2(captureDate.getMonth()+1)}${pad2(captureDate.getDate())}-${pad2(captureDate.getHours())}${pad2(captureDate.getMinutes())}`],
+      ['Field note', 'The sky chart is treated as a temporary ecological interface where historical figure, local horizon and user intervention become one score.']
+    ];
+    drawTextBlock(ctx,'01 / CAPTURE LOG', leftRows, M, heroY, 284, skySize, true, 'SITE / TIME / METER / TRANSPORT / OBSERVATIONAL READOUT');
+
+    // Always render the FULL sky: viewBox is forced to 0 0 1000 1000 in svgToImage,
+    // so app zoom never affects this capture.
+    const svgImg=await svgToImage(els.svg,1000,1000);
+    ctx.save();
+    ctx.strokeStyle='rgba(27,27,24,.22)'; ctx.lineWidth=1.25; ctx.strokeRect(skyX-14, heroY-14, skySize+28, skySize+28);
+    ctx.fillStyle='#f7f5ef'; ctx.fillRect(skyX, heroY, skySize, skySize);
+    ctx.drawImage(svgImg, skyX, heroY, skySize, skySize);
+    // edge registration ticks
+    ctx.strokeStyle='rgba(27,27,24,.26)';
+    const sMidX=skyX+skySize/2, sMidY=heroY+skySize/2;
+    ctx.beginPath(); ctx.moveTo(skyX-24,sMidY); ctx.lineTo(skyX-6,sMidY);
+    ctx.moveTo(skyX+skySize+6,sMidY); ctx.lineTo(skyX+skySize+24,sMidY);
+    ctx.moveTo(sMidX,heroY-24); ctx.lineTo(sMidX,heroY-6);
+    ctx.moveTo(sMidX,heroY+skySize+6); ctx.lineTo(sMidX,heroY+skySize+24); ctx.stroke();
+    // sky caption
+    ctx.fillStyle='rgba(27,27,24,.5)'; ctx.font='9px "IBM Plex Mono", monospace';
+    ctx.fillText('FULL-SKY POLAR PROJECTION · UNZOOMED · '+fs0.up.length+' STARS ABOVE LOCAL HORIZON', skyX+2, heroY+skySize+38);
+    ctx.restore();
+
+    // right-margin vertical caption, filling the strip beside the sky
+    ctx.save();
+    ctx.translate(W-40, heroY+skySize-20); ctx.rotate(-Math.PI/2);
+    ctx.fillStyle='rgba(27,27,24,.34)'; ctx.font='9px "IBM Plex Mono", monospace';
+    ctx.fillText('ARCHIVAL FULL-SKY SNAPSHOT / LOCAL HORIZON FRAME / NORTH AT TOP', 0, 0);
+    ctx.restore();
+
+    // ── 03 Diurnal phase cycle (real mini-skies four hours apart) ─────────
+    drawPhaseChart(ctx, M, phaseY, RIGHT-M, 200, clockHour, state.lat, state.lon, activeAbbrs);
+
+    // ── 04 / 05 / 06 analysis panels ──────────────────────────────────────
+    const protoInfo={ up:fs0.up.length, key:els.key.value, scale:SCALES[els.scale.value].label,
+      meter:ts.text, voices:activeVoices.length,
+      loop:activeVoices.reduce((m,v)=>Math.max(m, v.phrase?v.phrase.loopSteps:0),0) };
+    drawProtocolDiagram(ctx, colX(0), anY, COLW, anH, protoInfo);
+    drawDistributions(ctx, colX(1), anY, COLW, anH, sky);
+    drawSpatial(ctx, colX(2), anY, COLW, anH, sky, activeVoices);
+
+    // ── 07 / 08 / 09 dossiers ─────────────────────────────────────────────
+    drawTextBlock(ctx,'07 / USER-DRAWN DOSSIERS', drawnConstellationRows(sky), colX(0), dosY, COLW, dosH, true, 'TEMPORARY USER SYSTEMS / ACTIVE OVERLAYS / COORDINATE AND SONIC DOSSIERS');
+    drawTextBlock(ctx,'08 / SELECTED DOSSIERS', selectedConstellationRows(sky), colX(1), dosY, COLW, dosH, true, 'HISTORICAL FIGURES / RESEARCH NOTES / VISIBLE-STAR COORDINATES / SONIC FINGERPRINTS');
+    const summaryRows=[
+      ['Constellations tonight', `${state.active.size} selected / ${(els.rCons&&els.rCons.textContent)||'n/a'} visible-classical candidates`],
+      ['Selected figures', [...state.active].map(ab=>FIGURES[ab]&&FIGURES[ab].name).filter(Boolean).join(', ') || 'none'],
+      ['User systems', currentVisibleDrawings().map(dr=>displayName(dr)).join(', ') || 'none'],
+      ['Active voices', activeVoices.map(v=>`${v.label}: ${voiceSonicSummary(v)}`).join(' // ') || 'none'],
+      ['Protocol', 'altitude → pitch · magnitude → velocity · azimuth → pan · count + meter → loop lattice'],
+      ['Pseudo-code', 'visible.filter(alt>0).map(s => phrase.write(s.alt, s.az, s.mag, meter, palette));'],
+      ['Material note', 'gridded substrate / dry-ink absorption / scanner residue / registration drift / faded ecological blueprint'],
+      ['Render note', 'SVG chart rasterised to a page field with all columns aligned to the underlying measurement grid.']
+    ];
+    drawTextBlock(ctx,'09 / RENDER PROTOCOL + SUMMARY', summaryRows, colX(2), dosY, COLW, dosH, true, 'DENSE SYSTEM FIELD / TECHNICAL COMMENTARY / ECOLOGICAL PUBLICATION AESTHETIC');
+
+    // ── Negative-space enrichment (after content, skipping reserved zones) ─
+    drawAsciiScatter(ctx, W, H, [
+      [M, 60, RIGHT-M, 170],                       // masthead + system notes
+      [skyX-16, heroY-16, skySize+32, skySize+60], // hero sky
+      [M, heroY, 286, skySize],                    // capture log rail
+      [M, phaseY-6, RIGHT-M, 210],                 // phase band
+      [colX(0), anY, COLW, anH],[colX(1), anY, COLW, anH],[colX(2), anY, COLW, anH],
+      [colX(0), dosY, COLW, dosH],[colX(1), dosY, COLW, dosH],[colX(2), dosY, COLW, dosH],
+      [M, footRule, RIGHT-M, 60],
+    ]);
+
+    // ── Footer ────────────────────────────────────────────────────────────
+    ctx.fillStyle='rgba(27,27,24,.5)'; ctx.font='9px "IBM Plex Mono", monospace'; ctx.textAlign='left';
+    ctx.fillText('ARCHIVE_SKY_CAPTURE_001 · SOUND AS SYSTEM · SYSTEM AS ECOLOGY', M+2, 2426);
+    ctx.textAlign='right';
+    ctx.fillText('ALT-AZ COORDINATES / FULL-SKY UNZOOMED SNAPSHOT / PHASE CYCLE / SONIFICATION PROTOCOL / DOSSIERS', RIGHT, 2426);
+    ctx.textAlign='left';
+
+    const blob=await new Promise(res=>canvas.toBlob(res,'image/png'));
+    triggerDownloadBlob(blob, 'sky-capture.png');
+    log('Sky capture exported: enlarged full-sky chart, diurnal phase cycle, sonification protocol and field-distribution panels, on an aligned editorial grid.');
+  }catch(e){ console.error(e); log('Sky capture failed: '+e.message,true); }
 }
 
 
@@ -1194,18 +2466,32 @@ function startDrawingAt(starId){ addOrRemoveDrawingStar(starId); }
 function endDrawing(){
   if(!state.drawing || state.drawing.starIds.length<2){ state.drawing=null; renderSky(); log('Need at least two stars to make a line.',true); return; }
   const id='u'+(state.drawSeq++), paletteId=nextUserPalette();
-  const dr={ id, paletteId, mode:'even', starIds:state.drawing.starIds.slice(), closed:!!state.drawing.closed, label:state.drawings.length+1, name:null };
+  const dr={ id, paletteId, mode:'even', starIds:state.drawing.starIds.slice(), closed:!!state.drawing.closed, label:state.drawings.length+1, name:null, active:true };
   state.drawings.push(dr); state.drawing=null;
   buildVoice('usr:'+id, paletteById(paletteId), dr.starIds, displayName(dr), dr.mode);
   renderSky(); renderRail(); updateReadout();
   log('New line saved — '+paletteById(paletteId).name+'. It joins the music in key.');
 }
 function undoPoint(){ if(state.drawing && state.drawing.starIds.length){ state.drawing.starIds.pop(); if(!state.drawing.starIds.length) state.drawing=null; renderSky(); } }
+function toggleDrawing(id){
+  const dr=state.drawings.find(d=>d.id===id); if(!dr) return;
+  dr.active = dr.active===false;
+  if(dr.active){
+    const v=buildVoice('usr:'+id, paletteById(dr.paletteId), dr.starIds, displayName(dr), dr.mode);
+    if(!v){ dr.active=false; log(displayName(dr)+' has too few visible stars at this time.',true); }
+    else log(displayName(dr)+' switched on.');
+  }else{
+    disposeVoice('usr:'+id);
+    log(displayName(dr)+' switched off.');
+  }
+  renderSky(); renderRail(); updateReadout();
+}
 function removeDrawing(id){ const i=state.drawings.findIndex(d=>d.id===id); if(i<0) return; state.drawings.splice(i,1); disposeVoice('usr:'+id); renderSky(); renderRail(); updateReadout(); }
 function setDrawingMode(id, mode){
   const dr=state.drawings.find(d=>d.id===id); if(!dr) return; dr.mode=mode;
-  disposeVoice('usr:'+id); buildVoice('usr:'+id, paletteById(dr.paletteId), dr.starIds, displayName(dr), mode);
-  renderSky(); updateReadout(); log(displayName(dr)+' → '+MODES[mode]+'.');
+  disposeVoice('usr:'+id);
+  if(dr.active!==false) buildVoice('usr:'+id, paletteById(dr.paletteId), dr.starIds, displayName(dr), mode);
+  renderSky(); renderRail(); updateReadout(); log(displayName(dr)+' → '+MODES[mode]+(dr.active===false?' · still switched off.':'.'));
 }
 
 function svgPoint(evt){
@@ -1294,7 +2580,9 @@ function parseLocation(raw){
 function defaultVisibleFigure(){
   if(!state.sky) return null;
   const visible=Object.keys(FIGURES).map(a=>({a,up:figureVisible(a)})).filter(o=>o.up>=2).sort((x,y)=>FIGURES[x.a].name.localeCompare(FIGURES[y.a].name));
-  return visible.length?visible[0].a:null;
+  if(!visible.length) return null;
+  const bell=visible.find(o=>FIGURES[o.a] && FIGURES[o.a].palette==='bell');
+  return (bell||visible[0]).a;
 }
 function activateDefaultFigureOnce(){
   if(state.didAutoActivate || state.active.size || state.drawings.length) return;
@@ -1303,11 +2591,12 @@ function activateDefaultFigureOnce(){
   const v=buildVoice(key, paletteById(FIGURES[abbr].palette), figureVertices(abbr), FIGURES[abbr].name, 'even');
   if(v){ state.active.add(abbr); state.didAutoActivate=true; }
 }
-function doRender(){
+function doRender(opts){
+  opts=opts||{};
   applyTimeControls(); computeSky(); activateDefaultFigureOnce(); renderSky(); renderRail(); updateReadout();
   els.skyMsg.classList.add('hidden'); els.playBtn.disabled=false;
   voices.forEach(v=>rebuildVoicePhrase(v)); rebalance();
-  log('Charted '+state.sky.stars.length+' stars over '+state.locLabel+'. Select a constellation or connect stars.');
+  if(!opts.silent) log('Charted '+state.sky.stars.length+' stars over '+state.locLabel+'. Select a constellation or connect stars.');
 }
 function applyLocationInput(){
   const parsed=parseLocation(els.locInput.value||''); if(!parsed){ log('Couldn\u2019t place that — try a major city or “lat, lon” (e.g. 41.15, -8.61).',true); return false; }
@@ -1329,10 +2618,16 @@ els.locFind.addEventListener('click',()=>{
 });
 els.nowBtn.addEventListener('click',()=>{ state.useNow=true; els.hour.value=0; if(state.rendered) doRender(); else { applyTimeControls(); updateReadout(); } });
 els.hour.addEventListener('input',()=>{ state.useNow=false; if(state.rendered) doRender(); else { applyTimeControls(); updateReadout(); } });
+els.timeLfoWave.addEventListener('change',restartTimeLfo);
+els.timeLfoRate.addEventListener('input',()=>{ syncTimeLfoUI(); restartTimeLfo(); });
+els.timeLfoRange.addEventListener('input',()=>{ syncTimeLfoUI(); restartTimeLfo(); });
+syncTimeLfoUI();
 
 els.key.addEventListener('change',()=>{ voices.forEach(v=>rebuildVoicePhrase(v)); updateReadout(); });
 els.scale.addEventListener('change',()=>{ voices.forEach(v=>rebuildVoicePhrase(v)); updateReadout(); });
 els.register.addEventListener('change',()=>{ voices.forEach(v=>rebuildVoicePhrase(v)); });
+els.timeSignature.addEventListener('change',()=>applyTimeSignatureChange(false));
+els.timeSignature.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); els.timeSignature.blur(); } });
 
 els.playBtn.addEventListener('click',playPreview);
 els.stopBtn.addEventListener('click',()=>{ stopPreview(); log('Stopped.'); });
@@ -1348,10 +2643,14 @@ function scrollPanelIntoView(panel){
 }
 els.exportToggle.addEventListener('click',()=>{ const open=els.exportPanel.style.display!=='block'; els.exportPanel.style.display=open?'block':'none'; els.exportToggle.textContent=open?'Export MIDI ▾':'Export MIDI ▸'; if(open) scrollPanelIntoView(els.exportPanel); });
 els.midiDur.addEventListener('input',()=>{ els.midiDurVal.textContent=els.midiDur.value+' s'; });
+els.midiMode.addEventListener('change',updateMidiDownloadLabel);
+updateMidiDownloadLabel();
 els.downloadMidi.addEventListener('click',downloadMidi);
 els.audioExportToggle.addEventListener('click',()=>{ const open=els.audioExportPanel.style.display!=='block'; els.audioExportPanel.style.display=open?'block':'none'; els.audioExportToggle.textContent=open?'Export audio ▾':'Export audio ▸'; if(open) scrollPanelIntoView(els.audioExportPanel); });
+if(els.audioMode) els.audioMode.addEventListener('change',()=>{ els.downloadAudio.textContent=els.audioMode.value==='stems'?'Download stems .zip':'Download full audio'; });
 els.audioDur.addEventListener('input',()=>{ els.audioDurVal.textContent=els.audioDur.value+' s'; });
 els.downloadAudio.addEventListener('click',downloadAudio);
+els.skyCaptureBtn.addEventListener('click',exportSkyCapture);
 
 function resetTransportSliders(){
   els.tempo.value=74; els.density.value=55; els.volume.value=80;
@@ -1370,7 +2669,8 @@ function resetApp(){
 /* ── Boot ─────────────────────────────────────────────────────────────────── */
 if(typeof Tone==='undefined') log('Audio engine failed to load — the sky chart still works, but playback is disabled.',true);
 applyViewBox(); updateReadout();
-try{ doRender(); }catch(e){ console.error(e); }
+try{ doRender({silent:true}); }catch(e){ console.error(e); }
+setTimeout(()=>{ if(!state.isPlaying && voices.size) playPreview({auto:true}); },350);
 </script>
 </body>
 </html>
