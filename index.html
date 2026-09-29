@@ -52,10 +52,10 @@
     background:color-mix(in srgb, var(--paper) 92%, transparent);
     backdrop-filter:saturate(120%) blur(4px);
     border-bottom:1px solid var(--rule);
-    padding:calc(env(safe-area-inset-top,0px) + .55rem) 1.4rem .55rem;
+    padding:calc(env(safe-area-inset-top,0px) + .55rem) 0 .55rem;
   }
   .bar-inner{
-    max-width:56rem; margin:0 auto;
+    max-width:56rem; margin:0 auto; padding:0 1.4rem;
     display:flex; align-items:baseline; flex-wrap:wrap; gap:.5rem 1.3rem;
     font-family:var(--mono); font-size:.72rem; letter-spacing:.02em;
   }
@@ -80,7 +80,7 @@
   nav.top .n{ color:var(--faint); margin-right:.3rem; }
 
   /* ── reading column ──────────────────────────────────────────── */
-  main{ max-width:42rem; margin:0 auto; padding:3.4rem 1.4rem 5rem; }
+  main{ max-width:56rem; margin:0 auto; padding:3.4rem 1.4rem 5rem; }
 
   .dateline{
     font-family:var(--mono); font-size:.72rem; letter-spacing:.03em; color:var(--muted);
@@ -127,13 +127,21 @@
     font-family:var(--mono); font-size:.74rem; letter-spacing:.01em; color:var(--muted);
     margin:0 0 1rem;
   }
-  .links{ display:flex; flex-wrap:wrap; gap:.3rem 1.5rem; font-family:var(--mono); font-size:.8rem; }
+  .links{ display:flex; flex-wrap:wrap; align-items:center; gap:.5rem 1.4rem; font-family:var(--mono); font-size:.8rem; }
   .links a{
     color:var(--ink); text-decoration:none;
     border-bottom:1px solid var(--rule); padding-bottom:1px;
   }
   .links a:hover{ border-bottom-color:var(--ink); }
   .links a .g{ color:var(--faint); margin-right:.45rem; }
+  /* primary action: boxed, filled on hover, same size and face */
+  .links a.primary{
+    border:1px solid var(--ink); padding:.34rem .85rem;
+    letter-spacing:.02em; transition:background .15s ease, color .15s ease;
+  }
+  .links a.primary .g{ color:currentColor; opacity:.6; }
+  .links a.primary:hover{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  @media (prefers-reduced-motion:reduce){ .links a.primary{ transition:none; } }
 
   /* ── prose blocks (reuse notes) ──────────────────────────────── */
   .sub{ font-family:var(--serif); font-style:italic; font-size:1.15rem; color:var(--ink); margin:1.8rem 0 .8rem; }
@@ -165,6 +173,16 @@
     outline:2px solid var(--ink); outline-offset:3px; border-radius:1px;
   }
 
+  /* justified reading measure on desktop, ragged-left on small screens */
+  @media (min-width:561px){
+    main > p.intro,
+    .app p,
+    ol.steps li,
+    #reuse > p:not(.sub):not(.label){
+      text-align:justify; -webkit-hyphens:auto; hyphens:auto;
+    }
+  }
+
   @media (max-width:560px){
     body{ font-size:1.1rem; }
     .lede{ font-size:1.2rem; }
@@ -188,10 +206,10 @@
       <button class="tb a-lg" data-size="inc" aria-label="larger text">A+</button>
     </span>
     <nav class="top">
-      <a href="#map-to-midi"><span class="n">01</span><span data-en="map" data-pt="mapa">map</span></a>
-      <a href="#sky-to-midi"><span class="n">02</span><span data-en="sky" data-pt="céu">sky</span></a>
-      <a href="#motion-to-midi"><span class="n">03</span><span data-en="motion" data-pt="movimento">motion</span></a>
-      <a href="#your-daily-wavetable"><span class="n">04</span><span data-en="wavetable" data-pt="wavetable">wavetable</span></a>
+      <a href="map-to-midi/"><span class="n">01</span><span data-en="map" data-pt="mapa">map</span></a>
+      <a href="sky-to-midi/"><span class="n">02</span><span data-en="sky" data-pt="céu">sky</span></a>
+      <a href="motion-to-midi/"><span class="n">03</span><span data-en="motion" data-pt="movimento">motion</span></a>
+      <a href="your-daily-wavetable/"><span class="n">04</span><span data-en="wavetable" data-pt="wavetable">wavetable</span></a>
       <a href="#reuse"><span data-en="downloads" data-pt="descargas">downloads</span></a>
     </nav>
   </div>
@@ -219,7 +237,7 @@
          data-pt="Carrega um traço GPX, GeoJSON, KML ou desenhado à mão e transforma a sua forma, movimento e elevação em frases MIDI, harmonias e áudio exportável.">Upload a GPX, GeoJSON, KML or drawn route and transform its shape, motion and elevation into MIDI phrases, harmonies and exportable audio.</p>
       <p class="io">gpx / geojson / kml / route &rarr; midi &middot; harmony &middot; audio</p>
       <div class="links">
-        <a href="map-to-midi/"><span class="g">&#8250;</span><span data-en="open app" data-pt="abrir aplicação">open app</span></a>
+        <a class="primary" href="map-to-midi/"><span class="g">&#8250;</span><span data-en="open app" data-pt="abrir aplicação">open app</span></a>
         <a href="map-to-midi/index.html"><span class="g">&#8595;</span><span data-en="download html" data-pt="descarregar html">download html</span></a>
       </div>
     </article>
@@ -231,7 +249,7 @@
          data-pt="Seleciona constelações, liga estrelas e converte traços celestes em frases musicais. A posição, densidade e brilho das estrelas tornam-se ritmo, panorâmica e movimento melódico.">Select constellations, connect stars and convert drawn sky paths into musical phrases. Star positions, density and brightness become rhythm, panning and melodic movement.</p>
       <p class="io">stars / density / magnitude &rarr; rhythm &middot; pan &middot; melody</p>
       <div class="links">
-        <a href="sky-to-midi/"><span class="g">&#8250;</span><span data-en="open app" data-pt="abrir aplicação">open app</span></a>
+        <a class="primary" href="sky-to-midi/"><span class="g">&#8250;</span><span data-en="open app" data-pt="abrir aplicação">open app</span></a>
         <a href="sky-to-midi/index.html"><span class="g">&#8595;</span><span data-en="download html" data-pt="descarregar html">download html</span></a>
       </div>
     </article>
@@ -243,7 +261,7 @@
          data-pt="Usa uma webcam ou um vídeo carregado para seguir movimento, manchas e linhas, e converte o movimento em som sintetizado direto, eventos MIDI, exportações de áudio e vídeos renderizados.">Use a webcam or uploaded video to trace movement, blobs and lines, then turn motion into direct synthesized sound, MIDI events, audio exports and video renders.</p>
       <p class="io">webcam / video &rarr; synth &middot; midi &middot; audio &middot; video</p>
       <div class="links">
-        <a href="motion-to-midi/"><span class="g">&#8250;</span><span data-en="open app" data-pt="abrir aplicação">open app</span></a>
+        <a class="primary" href="motion-to-midi/"><span class="g">&#8250;</span><span data-en="open app" data-pt="abrir aplicação">open app</span></a>
         <a href="motion-to-midi/index.html"><span class="g">&#8595;</span><span data-en="download html" data-pt="descarregar html">download html</span></a>
       </div>
     </article>
@@ -255,7 +273,7 @@
          data-pt="Gera uma wavetable tocável a partir do estado do mar e de valores marítimos. Altura da onda, ondulação, corrente e período tornam-se corpo harmónico, movimento e evolução da forma de onda.">Generate a playable wavetable from sea-state and maritime values. Wave height, swell, current and period become harmonic body, motion and waveform evolution.</p>
       <p class="io">wave height / swell / current / period &rarr; harmonic body &middot; motion</p>
       <div class="links">
-        <a href="your-daily-wavetable/"><span class="g">&#8250;</span><span data-en="open app" data-pt="abrir aplicação">open app</span></a>
+        <a class="primary" href="your-daily-wavetable/"><span class="g">&#8250;</span><span data-en="open app" data-pt="abrir aplicação">open app</span></a>
         <a href="your-daily-wavetable/index.html"><span class="g">&#8595;</span><span data-en="download html" data-pt="descarregar html">download html</span></a>
       </div>
     </article>
